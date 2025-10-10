@@ -1,6 +1,8 @@
-# .github/workflows/clean-ci.yml
 name: Clean CI
-on: [pull_request]
+on:
+  pull_request:
+  push:
+    branches: [ main ]
 jobs:
   ci:
     runs-on: ubuntu-latest
