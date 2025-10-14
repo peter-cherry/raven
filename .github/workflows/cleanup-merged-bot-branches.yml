@@ -1,0 +1,17 @@
+name: Cleanup merged bot branches
+on:
+  pull_request:
+    types: [closed]
+permissions:
+  contents: write
+jobs:
+  cleanup:
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.head.ref, 'bot/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete merged branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+          REPO: ${{ github.repository }}
+        run: gh api -X DELETE "repos/${REPO}/git/refs/heads/${BRANCH}" || true
