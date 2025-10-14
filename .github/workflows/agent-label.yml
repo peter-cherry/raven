@@ -1,0 +1,22 @@
+name: Agent label
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+permissions:
+  pull-requests: write
+  contents: read
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label by source repo
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          N: ${{ github.event.pull_request.number }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+        run: |
+          add() { curl -s -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/issues/$N/labels" \
+            -d "{\"labels\":[\"$1\"]}" >/dev/null; }
+          [ "$HEAD_REPO" = "Raven-Hq/raven-codex" ] && add "agent:codex"
+          [ "$HEAD_REPO" = "peter-cherry/raven-claude" ] && add "agent:claude"
