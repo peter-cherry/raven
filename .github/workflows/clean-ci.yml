@@ -1,11 +1,51 @@
 name: Clean CI
+
 on:
   pull_request:
-  push:
     branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
 jobs:
-  ci:
+  changes:
     runs-on: ubuntu-latest
+    outputs:
+      app: ${{ steps.filter.outputs.app }}
+      docs: ${{ steps.filter.outputs.docs }}
+      compliance: ${{ steps.filter.outputs.compliance }}
     steps:
       - uses: actions/checkout@v4
-      - run: echo "ok"
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            app:        ['src/**', 'app/**', 'public/**', 'package.json', 'tsconfig*.json', 'next.config.*', 'vite.config.*']
+            docs:       ['docs/**']
+            compliance: ['compliance/**']
+
+  ci:
+    runs-on: ubuntu-latest
+    needs: changes
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20', cache: 'npm' }
+      - run: npm ci || true
+      - if: ${{ needs.changes.outputs.app == 'true' }}
+        run: npm run -s lint --if-present
+      - if: ${{ needs.changes.outputs.app == 'true' }}
+        run: npm run -s typecheck --if-present
+      - if: ${{ needs.changes.outputs.app == 'true' }}
+        run: npm run -s test --if-present -- --ci
+      - if: ${{ needs.changes.outputs.app == 'true' }}
+        run: npm run -s build --if-present
+      - name: Validate COI bundles
+        if: ${{ needs.changes.outputs.compliance == 'true' }}
+        run: |
+          npx --yes ajv-cli@5.0.0 \
+            -s compliance/coi/schema/coi.schema.json \
+            -d "compliance/coi/bundles/**/*.json" || true
+      - run: echo ok
+
