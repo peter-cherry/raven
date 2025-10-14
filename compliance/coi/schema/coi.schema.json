@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raven/schema/coi.schema.json",
+  "title": "Certificate of Insurance",
+  "type": "object",
+  "required": ["insured_name", "policy_number", "effective_date", "expiration_date", "lines"],
+  "properties": {
+    "insured_name": { "type": "string", "minLength": 1 },
+    "insurer": { "type": "string" },
+    "policy_number": { "type": "string" },
+    "effective_date": { "type": "string", "format": "date" },
+    "expiration_date": { "type": "string", "format": "date" },
+    "certificate_holder": { "type": "string" },
+    "limits": {
+      "type": "object",
+      "properties": {
+        "general_aggregate": { "type": "string" },
+        "each_occurrence": { "type": "string" },
+        "auto_combined_single_limit": { "type": "string" },
+        "wc_each_accident": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "endorsements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["code"],
+        "properties": {
+          "code": { "type": "string", "description": "e.g. CG 20 10, CG 20 37" },
+          "description": { "type": "string" },
+          "file_url": { "type": "string", "format": "uri" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "lines": {
+      "type": "array",
+      "items": { "enum": ["GL", "AUTO", "WC", "UMBRELLA"] },
+      "minItems": 1
+    },
+    "files": {
+      "type": "array",
+      "items": { "type": "string", "format": "uri" }
+    },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": false
+}
