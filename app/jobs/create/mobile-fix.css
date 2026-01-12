@@ -1,0 +1,254 @@
+/* CREATE WORK ORDER PAGE - New Design System v1 */
+/* Clean, light theme aligned with design-system.css */
+
+.create-work-order-page {
+  min-height: 100vh;
+  background: var(--ds-bg-subtle, #f8f9fa);
+  padding: var(--ds-space-6, 24px);
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.form-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  gap: var(--ds-space-4, 16px);
+}
+
+/* Form Container - Card Style */
+.form-wrapper .card,
+.form-wrapper form.form-grid {
+  width: 100%;
+  background: var(--ds-bg-surface, #ffffff);
+  border: 1px solid var(--ds-border-default, #e0e0e0);
+  border-radius: var(--ds-radius-xl, 12px);
+  padding: var(--ds-space-6, 24px);
+  box-sizing: border-box;
+  box-shadow: var(--ds-shadow-sm, 0 1px 2px rgba(0,0,0,0.05));
+}
+
+/* Policy Preview Card */
+.form-wrapper .container-card {
+  width: 100%;
+  background: var(--ds-bg-surface, #ffffff);
+  border: 1px solid var(--ds-border-default, #e0e0e0);
+  border-radius: var(--ds-radius-lg, 8px);
+  padding: var(--ds-space-4, 16px);
+  box-sizing: border-box;
+}
+
+/* Form Grid */
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-5, 20px);
+  width: 100%;
+}
+
+/* Form Fields */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-space-2, 8px);
+}
+
+/* Form Labels */
+.form-label {
+  font-size: var(--ds-text-sm, 14px);
+  font-weight: var(--ds-font-medium, 500);
+  color: var(--ds-text-primary, #212529);
+}
+
+/* Form Inputs */
+.form-input,
+.text-input,
+.select-input,
+.textarea-input {
+  width: 100%;
+  padding: var(--ds-space-3, 12px) var(--ds-space-4, 16px);
+  font-size: var(--ds-text-sm, 14px);
+  color: var(--ds-text-primary, #212529);
+  background: var(--ds-bg-base, #ffffff);
+  border: 1px solid var(--ds-border-default, #e0e0e0);
+  border-radius: var(--ds-radius-md, 6px);
+  box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  font-family: inherit;
+}
+
+.form-input:focus,
+.text-input:focus,
+.select-input:focus,
+.textarea-input:focus {
+  outline: none;
+  border-color: var(--ds-accent-primary, #007bff);
+  box-shadow: 0 0 0 3px var(--ds-accent-primary-light, rgba(0, 123, 255, 0.15));
+}
+
+.form-input::placeholder,
+.text-input::placeholder,
+.textarea-input::placeholder {
+  color: var(--ds-text-tertiary, #adb5bd);
+}
+
+/* Select Inputs */
+.select-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 40px;
+}
+
+/* Textarea */
+.textarea-input {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* Shimmer Loading */
+@keyframes shimmer {
+  0% { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+
+.shimmer-loading {
+  animation: shimmer 2s infinite ease-in-out;
+  background-image: linear-gradient(
+    90deg,
+    var(--ds-bg-elevated, #f1f3f5) 0%,
+    var(--ds-bg-base, #ffffff) 20%,
+    var(--ds-border-subtle, #f0f0f0) 40%,
+    var(--ds-bg-base, #ffffff) 60%,
+    var(--ds-bg-elevated, #f1f3f5) 100%
+  );
+  background-color: var(--ds-bg-elevated, #f1f3f5);
+  background-size: 600px 100%;
+  background-repeat: no-repeat;
+  color: transparent !important;
+  pointer-events: none;
+}
+
+.shimmer-loading::placeholder {
+  color: transparent !important;
+}
+
+/* Policy Modal */
+.policy-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--ds-z-modal, 1000);
+  padding: var(--ds-space-4, 16px);
+}
+
+.policy-modal-card {
+  background: var(--ds-bg-surface, #ffffff);
+  border-radius: var(--ds-radius-xl, 12px);
+  padding: var(--ds-space-6, 24px);
+  max-width: 480px;
+  width: 100%;
+  box-shadow: var(--ds-shadow-xl);
+}
+
+/* Score Badge */
+.score-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  border-radius: var(--ds-radius-full, 9999px);
+  font-size: var(--ds-text-xs, 12px);
+  font-weight: var(--ds-font-semibold, 600);
+}
+
+.score-badge.high {
+  background: var(--ds-success-bg);
+  color: var(--ds-success);
+}
+
+.score-badge.medium {
+  background: var(--ds-warning-bg);
+  color: var(--ds-warning);
+}
+
+.score-badge.low {
+  background: var(--ds-error-bg);
+  color: var(--ds-error);
+}
+
+/* Status Dots */
+.mini-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dot-green {
+  background: var(--ds-success);
+}
+
+.dot-amber {
+  background: var(--ds-warning);
+}
+
+.dot-red {
+  background: var(--ds-error);
+}
+
+/* Buttons */
+.outline-button {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--ds-border-default);
+  border-radius: var(--ds-radius-md);
+  color: var(--ds-text-primary);
+  font-size: var(--ds-text-sm);
+  font-weight: var(--ds-font-medium);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.outline-button:hover {
+  background: var(--ds-bg-elevated);
+  border-color: var(--ds-border-strong);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .create-work-order-page {
+    padding: var(--ds-space-4, 16px);
+  }
+
+  .form-wrapper {
+    width: 100%;
+    padding: 0;
+  }
+
+  .form-wrapper .card,
+  .form-wrapper form.form-grid {
+    padding: var(--ds-space-4, 16px);
+  }
+
+  .form-grid {
+    gap: var(--ds-space-4, 16px);
+  }
+
+  /* Make inputs larger for touch */
+  .form-input,
+  .text-input,
+  .select-input,
+  .textarea-input {
+    font-size: 16px !important; /* Prevent iOS zoom */
+    padding: var(--ds-space-4, 16px);
+  }
+}

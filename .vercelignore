@@ -1,0 +1,4 @@
+# Exclude demo/test pages from production deployment
+app/design-system-demo
+app/framework-demo
+app/restaurant-demo

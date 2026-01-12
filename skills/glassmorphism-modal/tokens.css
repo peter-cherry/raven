@@ -1,0 +1,364 @@
+/**
+ * Ravensearch Design Tokens v2.0
+ * Created from Figma /search design specifications
+ *
+ * USAGE: Import this file when instructed to "apply design tokens"
+ * DO NOT apply automatically - wait for explicit instruction
+ */
+
+:root {
+  /* === BACKGROUNDS === */
+  --bg-page: #2F2F2F;
+  --bg-sidebar: #2F2F2F;
+  --bg-main-content: #2F2F2F;
+
+  /* Search box gradient background */
+  --bg-search-box: linear-gradient(90deg,
+    rgb(45, 45, 45) 0%,
+    rgb(47, 47, 47) 1.54%,
+    rgb(47, 47, 47) 98.52%,
+    rgb(43, 43, 43) 100%
+  );
+
+  /* === BORDERS / STROKES === */
+  --stroke-primary: #656290;           /* Sidebar, search box, raven logo, mobile menu */
+  --stroke-secondary: #575B5A;         /* Raven button (enter) */
+
+  /* === TEXT COLORS === */
+  --text-date: #656290;                /* October 24, 2025 */
+  --text-signup: #656290;              /* Sign up button */
+  --text-login: #B4B4C4;               /* Login button */
+  --text-placeholder: #454654;         /* "Paste Work Order Here + enter" */
+
+  /* Greeting gradient */
+  --text-greeting-gradient: linear-gradient(90deg, #9392AF 0%, #CDCDE5 100%);
+  --text-greeting-start: #9392AF;
+  --text-greeting-end: #CDCDE5;
+
+  /* === ICON COLORS === */
+  --icon-profile-ellipse: #B4B4C4;     /* Profile icon background */
+  --icon-plus: #B4B4C4;                /* Plus icon top right */
+  --icon-arrow: #B4B4C4;               /* Arrow in enter button */
+  --icon-dropdown: #6D6B80;            /* Dropdown arrow */
+
+  /* === EFFECTS === */
+  --shadow-search-box: 0px 0px 22.9px rgba(0, 0, 0, 0.21);
+  --border-radius-search: 16px;
+  --border-radius-raven-logo: 13px;
+  --border-radius-raven-btn: 9px;
+
+  /* === TYPOGRAPHY === */
+  --font-futura: 'Futura', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-besley: 'Besley', serif;
+
+  /* Font weights */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+
+  /* Font sizes - Desktop */
+  --text-greeting-desktop: 40px;
+  --text-header-desktop: 24px;
+  --text-search-input-desktop: 24px;
+
+  /* Font sizes - Mobile */
+  --text-greeting-mobile: 28px;
+  --text-search-input-mobile: 18px;
+
+  /* === DIMENSIONS === */
+  --sidebar-width: 68px;
+  --search-box-width: 615px;
+  --search-box-height: 143px;
+  --raven-logo-size: 53px;
+  --nav-icon-size: 20px;
+  --profile-icon-size: 41px;
+
+  /* === SPACING === */
+  --raven-logo-offset: 81px;           /* Distance above search box */
+  --greeting-line-height: 67px;
+
+  /* === MAP & DISPATCH LOADER === */
+
+  /* Map Colors */
+  --map-road-color: #9b98ca;           /* Purple roads */
+  --map-road-opacity: 0.4;             /* 40% opacity */
+  --map-building-color-2d: #7b78aa;    /* 2D buildings */
+  --map-building-color-3d: #9b98ca;    /* 3D buildings */
+  --map-building-opacity: 0.6;         /* Building opacity */
+  --map-land-color: #9b98ca;           /* Land elements */
+  --map-land-opacity: 0.2;             /* 20% opacity */
+  --map-text-color: #FFFFFF;           /* Street names and numbers */
+
+  /* Marker Colors */
+  --marker-wo-color: #FFFFFF;          /* Work Order marker (white) */
+  --marker-tech-1: #83C596;            /* Technician marker 1 (mint green) */
+  --marker-tech-2: #C5839C;            /* Technician marker 2 (mauve pink) */
+  --marker-tech-3: #B8C583;            /* Technician marker 3 (olive green) */
+  --marker-tech-4: #83C596;            /* Technician marker 4 (mint green) */
+  --marker-tech-5: #C5AC83;            /* Technician marker 5 (tan) */
+
+  /* Marker Sizes */
+  --marker-wo-width: 21.7px;           /* WO marker width (30% smaller) */
+  --marker-wo-height: 28px;            /* WO marker height */
+  --marker-tech-width: 15.5px;         /* Tech marker width (50% of original) */
+  --marker-tech-height: 20px;          /* Tech marker height */
+
+  /* Dispatch Loader */
+  --dispatch-loader-width: 915px;      /* Modal width */
+  --dispatch-loader-height: 800px;     /* Modal height */
+  --dispatch-pulse-duration: 1500ms;   /* Road pulse animation duration */
+  --dispatch-pulse-intensity: 0.1;     /* 10% luminosity increase */
+  --dispatch-zoom-duration: 1500ms;    /* Initial zoom animation */
+  --dispatch-zoom-start: 16;           /* Start zoom level */
+  --dispatch-zoom-end: 12;             /* End zoom level */
+
+  /* === OVERLAY MODAL / GLASSMORPHISM CARD === */
+
+  /* Modal Background & Effects */
+  --modal-bg: rgba(47, 47, 47, 0.95);              /* 95% opacity dark grey - more solid */
+  --modal-backdrop-blur: blur(0px);                /* No backdrop blur for work orders */
+  --modal-border: 1px solid rgba(154, 150, 213, 0.3);  /* Purple border 30% opacity */
+  --modal-border-radius: 16px;                     /* Rounded corners */
+  --modal-shadow: 0px 0px 22.9px rgba(0, 0, 0, 0.21);  /* Drop shadow */
+  --modal-padding: 40px;                           /* Inner padding */
+
+  /* Container Backgrounds & Effects */
+  --container-bg: rgba(178, 173, 201, 0.05);       /* 5% opacity light purple */
+  --container-border: 1px solid rgba(249, 243, 229, 0.33);  /* Cream border 33% opacity */
+  --container-border-radius: 8px;                  /* Container corners */
+  --container-hover-bg: rgba(178, 173, 201, 0.15); /* 15% opacity on hover */
+  --container-hover-border: rgba(249, 243, 229, 0.3);  /* 30% opacity on hover */
+
+  /* Text Fade Gradient (Bottom of collapsed containers) */
+  --container-fade-gradient: linear-gradient(180deg,
+    rgba(178, 173, 201, 0) 0%,
+    rgba(178, 173, 201, 0.05) 30%,
+    rgba(178, 173, 201, 0.05) 100%);
+
+  /* Typography - Section Headers */
+  --font-section-title: 'Futura', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-section-title-size: 32px;                 /* WO number */
+  --font-section-title-weight: 700;                /* Bold */
+  --font-section-subtitle-size: 16px;              /* "Dispatch Progress" */
+  --font-section-subtitle-weight: 500;             /* Medium */
+
+  /* Typography - Text Content */
+  --font-text-title: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-text-title-size: 14px;                    /* First line of WO text */
+  --font-text-title-weight: 700;                   /* Bold */
+  --font-text-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-text-body-size: 12px;                     /* Body text */
+  --font-text-body-weight: 400;                    /* Regular */
+  --font-text-body-line-height: 1.328125em;        /* Line height for readability */
+
+  /* Typography - Progress Steps */
+  --font-progress-step: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-progress-step-size: 12px;
+  --font-progress-step-weight: 400;                /* Regular weight for all steps */
+  --font-progress-step-line-height: 1.31884765625em;
+
+  /* Text Colors */
+  --text-primary: #FFFFFF;                         /* Main text, headers */
+  --text-secondary: #BAB3C4;                       /* Progress dots, cursor */
+  --text-close-btn: #B4B4C4;                       /* Close X icon */
+  --text-hover: #CDCDE5;                           /* WO number on hover */
+  --text-chevron: rgba(249, 243, 229, 0.33);       /* Expand/collapse chevrons 33% opacity */
+
+  /* Icon Colors */
+  --icon-progress-step: #6D699E;                   /* Step icons (check, search, etc) */
+  --icon-zoom-controls: rgba(249, 243, 229, 0.33); /* Zoom +/- and expand icons 33% opacity */
+  --btn-map-control-border: rgba(249, 243, 229, 0.33); /* Map control button borders 33% opacity */
+
+  /* Spacing & Layout */
+  --spacing-modal-top: 45px;                       /* Top padding inside modal */
+  --spacing-modal-left: 45px;                      /* Left padding inside modal */
+  --spacing-between-containers: 25px;              /* Gap between WO text, map, progress */
+  --spacing-container-padding: 16px;               /* Internal container padding */
+  --spacing-wo-number-to-text: 25px;               /* Gap from WO# to text box */
+
+  /* Container Dimensions */
+  --container-wo-text-width: 400px;
+  --container-wo-text-height-collapsed: 120px;
+  --container-wo-text-height-expanded: 240px;
+  --container-map-width-collapsed: 400px;
+  --container-map-width-expanded: 600px;
+  --container-map-height-collapsed: 267px;
+  --container-map-height-expanded: 400px;
+  --container-progress-width: 400px;
+  --container-progress-height: 240px;
+
+  /* Button Sizes */
+  --btn-close-size: 32px;                          /* Close button */
+  --btn-zoom-size: 32px;                           /* Zoom controls */
+  --btn-expand-size: 24px;                         /* Chevron buttons */
+  --btn-corner-radius: 6px;                        /* Button corner radius */
+
+  /* Progress Step Elements */
+  --progress-dot-size: 8px;                        /* Timeline dots */
+  --progress-dot-color: #BAB3C4;
+  --progress-line-width: 2px;
+  --progress-line-height: 16px;                    /* Connecting line height between icons */
+  --progress-line-color: rgba(249, 243, 229, 0.33); /* Cream color matching container borders */
+  --progress-line-gap: 16px;                       /* Gap between icon and connecting line */
+  --progress-icon-size: 22.5px;                    /* Step icons (25% larger) */
+  --progress-step-spacing: 70.5px;                 /* Total spacing between icon start positions */
+  --progress-icon-text-gap: 16.5px;                /* Gap between icon and text */
+  --progress-text-size: 14px;                      /* Progress step text size */
+  --progress-line-animation-duration: 0.8s;        /* Line extension animation speed */
+
+  /* Animations & Effects */
+  --flicker-border: 2px solid rgba(255, 255, 255, 0.5);  /* Typing indicator */
+  --cursor-width: 2px;
+  --cursor-height: 14px;
+  --cursor-color: #BAB3C4;
+  --transition-expand: 0.3s ease;                  /* Container expansion */
+  --transition-hover: 0.2s;                        /* Button hover */
+
+  /* Z-Index Hierarchy */
+  --z-modal-backdrop: 9999;                        /* Modal overlay */
+  --z-modal-content: 10000;                        /* Modal content */
+  --z-close-button: 1000;                          /* Close button */
+  --z-chevron-button: 20;                          /* Expand/collapse buttons */
+  --z-map-controls: 10;                            /* Zoom and expand controls */
+  --z-section-header: 100;                         /* WO number header */
+
+  /* Background Images */
+  --bg-dispatch-overlay: url("https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=1920&h=1080&fit=crop&q=90");
+  --bg-dispatch-overlay-opacity: 0.2;
+  --bg-dispatch-overlay-blur: blur(4px);
+
+  /* Responsive Breakpoints */
+  --breakpoint-mobile: 768px;
+  --breakpoint-tablet: 1024px;
+  --breakpoint-desktop: 1440px;
+
+  /* State Colors (for progress steps) */
+  --state-completed: #BAB3C4;                      /* Completed steps */
+  --state-in-progress: #FFFFFF;                    /* Active step */
+  --state-pending: rgba(186, 179, 196, 0.4);       /* Future steps */
+}
+
+/* === ANIMATION KEYFRAMES === */
+
+@keyframes shimmer {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes flicker {
+  0%, 100% {
+    opacity: 1;
+  }
+  25% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  75% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes blink {
+  0%, 49% {
+    opacity: 1;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
+}
+
+/* === COMPONENT-SPECIFIC TOKENS === */
+
+/* Search Box */
+.search-box {
+  background: var(--bg-search-box);
+  border: 2px solid var(--stroke-primary);
+  border-radius: var(--border-radius-search);
+  box-shadow: var(--shadow-search-box);
+}
+
+/* Greeting Text */
+.greeting {
+  font-family: var(--font-besley);
+  font-weight: var(--weight-semibold);
+  background: var(--text-greeting-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Raven Logo */
+.raven-logo {
+  border: 2px solid var(--stroke-primary);
+  border-radius: var(--border-radius-raven-logo);
+}
+
+/* Search Input */
+.search-input {
+  font-family: var(--font-futura);
+  font-weight: var(--weight-medium);
+  color: var(--text-placeholder);
+  text-align: center;
+}
+
+.search-input::placeholder {
+  color: var(--text-placeholder);
+}
+
+/* Icons */
+.plus-icon {
+  color: var(--icon-plus);
+}
+
+.arrow-icon {
+  color: var(--icon-arrow);
+}
+
+.user-profile {
+  background: var(--icon-profile-ellipse);
+}
+
+/* Sidebar */
+.sidebar {
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--stroke-primary);
+}
+
+/* Header Elements */
+.date-time {
+  color: var(--text-date);
+}
+
+.btn-login {
+  color: var(--text-login);
+}
+
+.btn-signup {
+  color: var(--text-signup);
+}
+
+/* Mobile Menu */
+.mobile-menu-dropdown {
+  border: 2px solid var(--stroke-primary);
+}
+
+/* === NOTES === */
+/*
+When "apply design tokens" instruction is given:
+1. Apply search box: background, border, shadow
+2. Buttons handled separately step by step
+3. Test each page before applying to all
+
+Color Palette Summary:
+- Primary Purple: #656290 (borders, accents)
+- Light Purple: #B4B4C4 (icons, login)
+- Dark Grey: #2F2F2F (backgrounds)
+- Input Text: #454654 (placeholder)
+- Gradient: #9392AF → #CDCDE5 (greeting)
+*/

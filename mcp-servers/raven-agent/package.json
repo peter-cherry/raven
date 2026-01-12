@@ -1,0 +1,21 @@
+{
+  "name": "raven-agent-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for Raven Agent persistent development assistant",
+  "type": "module",
+  "bin": {
+    "raven-agent-server": "./index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  }
+}

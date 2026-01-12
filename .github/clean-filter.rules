@@ -1,0 +1,29 @@
+# === allowlist canonical content to sync into Clean ===
+
+# App / backend / frontend code
++ /src/**
++ /app/**
++ /server/**
++ /api/**
++ /db/**
++ /public/**
++ /docs/**
++ /compliance/**
+
+# Root configs needed for builds
++ /package.json
++ /package-lock.json
++ /pnpm-lock.yaml
++ /yarn.lock
++ /tsconfig*.json
++ /next.config.*
++ /vite.config.*
++ /.eslintrc*
++ /.prettierrc*
+
+# Top-level docs
++ /README.md
++ /CONTRIBUTING.md
+
+# Everything else excluded (including .github)
+- /*

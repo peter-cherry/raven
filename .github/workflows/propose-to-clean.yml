@@ -1,0 +1,80 @@
+name: Propose to Clean
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  propose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout agent repo
+        uses: actions/checkout@v4
+
+      - name: Ensure filter exists
+        run: |
+          test -f .github/clean-filter.rules || { echo "::error::Missing .github/clean-filter.rules"; exit 1; }
+          sed -n '1,120p' .github/clean-filter.rules || true
+
+      - name: Build filtered payload
+        run: |
+          set -euxo pipefail
+          rm -rf clean && mkdir clean
+          rsync -av --delete --filter='merge .github/clean-filter.rules' . ./clean
+          echo "---- Payload preview ----"
+          (cd clean && find . -maxdepth 2 -type f | sed 's#^\./##' | sort | sed -n '1,80p')
+
+      - name: Prepare stable bot branch (one per agent)
+        run: echo "BRANCH=bot/${{ github.event.repository.name }}" >> "$GITHUB_ENV"
+
+      - name: Push branch to Clean
+        working-directory: clean
+        env:
+          TOKEN: ${{ secrets.CLEAN_REPO_TOKEN }}   # fine-grained PAT for peter-cherry/raven
+          CLEAN_REPO: ${{ secrets.CLEAN_REPO }}     # e.g. peter-cherry/raven
+          BRANCH: ${{ env.BRANCH }}
+        run: |
+          set -euxo pipefail
+          git init
+          git config user.name "raven-bot"
+          git config user.email "raven-bot@users.noreply.github.com"
+          git remote add origin "https://x-access-token:${TOKEN}@github.com/${CLEAN_REPO}.git"
+          git checkout -B "${BRANCH}"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to propose."
+            exit 0
+          fi
+          git commit -m "feat(bot): propose from $GITHUB_REPOSITORY@$GITHUB_SHA"
+          git push -u origin "${BRANCH}" || git push origin "${BRANCH}"
+
+      - name: Open or reuse PR into Clean
+        uses: actions/github-script@v7
+        env:
+          CLEAN_REPO: ${{ secrets.CLEAN_REPO }}
+          BRANCH: ${{ env.BRANCH }}
+        with:
+          github-token: ${{ secrets.CLEAN_REPO_TOKEN }}
+          script: |
+            const core = require('@actions/core');
+            const [owner, repo] = process.env.CLEAN_REPO.split('/');
+            const branch = process.env.BRANCH;
+
+            // List open PRs and match by head.ref (branch name)
+            const prs = await github.paginate(github.rest.pulls.list, { owner, repo, state: 'open', per_page: 100 });
+            const existing = prs.find(p => p.head && p.head.ref === branch);
+
+            if (!existing) {
+              const pr = await github.rest.pulls.create({
+                owner, repo, head: branch, base: 'main',
+                title: `feat(bot): propose changes from ${context.repo.owner}/${context.repo.repo}`,
+                body: `Automated proposal from **${context.repo.owner}/${context.repo.repo}** (source: ${context.sha})`
+              });
+              core.info(`Opened PR #${pr.data.number}`);
+            } else {
+              core.info(`Reusing PR #${existing.number}`);
+            }

@@ -1,0 +1,485 @@
+/* v2.0 - Updated colors and gradients */
+@import url('https://fonts.googleapis.com/css2?family=Besley:wght@600&display=swap');
+
+@font-face {
+    font-family: 'Futura';
+    font-weight: 500;
+    font-style: normal;
+    src: local('Futura Medium'), local('Futura-Medium');
+}
+
+/* Custom scrollbar for technician cards - visible only on hover */
+.technician-cards-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.technician-cards-scroll::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 3px;
+}
+
+.technician-cards-scroll::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 3px;
+    transition: background 0.3s ease;
+}
+
+.technician-cards-scroll:hover::-webkit-scrollbar-thumb {
+    background: rgba(154, 150, 213, 0.3);
+}
+
+.technician-cards-scroll:hover::-webkit-scrollbar-thumb:hover {
+    background: rgba(154, 150, 213, 0.5);
+}
+
+.page-container {
+    display: flex;
+    min-height: 100vh;
+    position: relative;
+    background: transparent;
+    font-family: 'Futura', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #fff;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* Sidebar - 68px wide */
+.sidebar {
+    width: 68px;
+    background: rgba(47, 47, 47, 0.3); /* Semi-transparent to show background through */
+    backdrop-filter: blur(12px); /* Blur effect for glass-morphism */
+    -webkit-backdrop-filter: blur(12px); /* Safari support */
+    border-right: 1px solid rgba(154, 150, 213, 0.3); /* Semi-transparent border */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 320px 0 52px 0;
+    position: fixed;
+    height: 1075px;
+    left: 0;
+    top: 0;
+    z-index: 10000;
+}
+
+.nav-icon {
+    width: 20px;
+    height: 20px;
+    margin: 30px 0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.nav-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.nav-icon svg path {
+    fill: #656290;
+    transition: fill 0.2s;
+}
+
+.nav-icon:hover svg path {
+    fill: #7C78A6;
+}
+
+.nav-icon.active svg path {
+    fill: #9392AF;
+}
+
+.user-profile {
+    width: 41px;
+    height: 41px;
+    background: #B4B4C4;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #656290;
+    font-size: 24px;
+    font-weight: 500;
+}
+
+.bottom-push {
+    position: absolute;
+    bottom: 350px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    margin-left: 68px;
+    background: transparent;
+    position: relative;
+    min-height: 100vh;
+    z-index: 10;
+}
+
+/* Header */
+.header {
+    padding: 22px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.date-time {
+    background: linear-gradient(90deg, #FFFFFF 0%, #E8E8F2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.btn-login {
+    background: linear-gradient(90deg, #FFFFFF 0%, #E8E8F2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Futura', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.btn-signup {
+    color: #656290;
+    background: transparent;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Futura', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.dropdown-icon {
+    width: 10px;
+    height: 6px;
+    fill: #6D6B80;
+}
+
+/* Search Container - centered on page (accounting for 68px sidebar) */
+.search-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(calc(-50% + 34px), -50%); /* Shift right by half sidebar width */
+    width: 615px;
+    z-index: 100;
+}
+
+.greeting {
+    position: absolute;
+    top: -90px;
+    left: 82px;
+    font-family: 'Besley', serif;
+    font-size: 40px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 67px;
+    width: 600px; /* Increased from 464px to fit longer names */
+    height: 76px;
+    text-align: left;
+    white-space: nowrap; /* Prevent text wrapping */
+    overflow: visible; /* Make sure text isn't clipped */
+}
+
+/* Search Box - 615x183 (increased by 40px) */
+.search-box {
+    position: relative;
+    width: 615px;
+    height: 183px;
+    background: rgba(47, 47, 47, 0.3); /* Semi-transparent to show background through */
+    backdrop-filter: blur(12px); /* Blur effect for glass-morphism */
+    -webkit-backdrop-filter: blur(12px); /* Safari support */
+    filter: brightness(1.15); /* Brightness filter matching sidebar */
+    border: 1px solid rgba(154, 150, 213, 0.3); /* Semi-transparent purple border */
+    border-radius: 16px;
+}
+
+/* Placeholder text - centered horizontally and vertically */
+.search-input {
+    position: absolute;
+    left: 7px;
+    top: 20px; /* Upper part of search box */
+    width: calc(100% - 14px);
+    height: calc(100% - 40px);
+    background: transparent;
+    border: none !important;
+    outline: none !important;
+    color: #9392AF; /* Left side of greeting gradient - solid color */
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 12pt;
+    font-weight: 400; /* Regular */
+    line-height: 1.5;
+    resize: none;
+    text-align: left;
+    padding-left: 18px; /* 25px from left border minus 7px offset = 18px padding */
+    padding-top: 5px;
+    box-shadow: none !important;
+}
+
+.search-input:focus {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.search-input::placeholder {
+    color: #8a8599; /* Decreased saturation by 30% */
+    opacity: 0.36; /* Decreased opacity by another 40%: 0.6 * 0.6 = 0.36 */
+    text-align: center;
+    line-height: 1.2;
+    transform: translateY(37px); /* Move placeholder down by 37px */
+}
+
+/* Plus icon - positioned at top right */
+.plus-icon {
+    position: absolute;
+    top: 9px;
+    right: 9px;
+    width: 40px;
+    height: 40px;
+    color: #B4B4C4;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border-radius: 6px;
+    padding: 8px;
+}
+
+.plus-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+    pointer-events: none;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.plus-icon svg path,
+.plus-icon svg line {
+    stroke: #FFFFFF !important;
+    stroke-width: 3 !important;
+    visibility: visible !important;
+}
+
+/* Raven logo - positioned 81px above search box */
+.raven-logo {
+    position: absolute;
+    top: -81px;
+    left: 0;
+    width: 53px;
+    height: 53px;
+    border: 2px solid #9a96d5; /* Increased luminosity by 50%: #656290 -> #9a96d5 */
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.raven-logo svg {
+    width: 27px;
+    height: 39px;
+}
+
+.raven-logo svg path {
+    fill: #9a96d5; /* Increased luminosity by 50% */
+}
+
+/* Left button (profile/compliance) - 48x48, 7px from left and bottom */
+.profile-btn {
+    position: absolute;
+    left: 7px;
+    bottom: 7px;
+    width: 48px;
+    height: 48px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 10;
+    pointer-events: auto;
+    display: none; /* Hidden - profile button moved to header */
+}
+
+/* Right button (Raven) - 39x39, 7px from right and bottom */
+.raven-btn {
+    position: absolute;
+    right: 7px;
+    bottom: 7px;
+    width: 39px;
+    height: 39px;
+    background: transparent;
+    border: 1px solid #9a96d5; /* Increased luminosity by 50% */
+    border-radius: 9px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 100; /* Ensure button stays on top */
+}
+
+.raven-btn:hover {
+    border-color: #6C72C9;
+    background: rgba(108, 114, 201, 0.1);
+}
+
+.arrow-icon {
+    width: 28px;
+    height: 28px;
+    color: #B4B4C4;
+}
+
+/* Hamburger Menu - Hidden on desktop */
+.hamburger-menu {
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000 !important;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    color: white;
+}
+
+.mobile-menu-dropdown {
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    background: linear-gradient(90deg,
+        rgb(45, 45, 45) 0%,
+        rgb(47, 47, 47) 1.54%,
+        rgb(47, 47, 47) 98.52%,
+        rgb(43, 43, 43) 100%
+    );
+    border: 2px solid #656290;
+    border-radius: 16px;
+    box-shadow: 0px 0px 22.9px rgba(0, 0, 0, 0.21);
+    padding: 8px 0;
+    z-index: 9999 !important;
+    min-width: 150px;
+}
+
+.mobile-menu-item {
+    display: block;
+    width: 100%;
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    color: #F9F3E5;
+    font-family: 'Futura', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.mobile-menu-item:hover {
+    background: rgba(108, 114, 201, 0.1);
+    color: #8B90E0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .hamburger-menu {
+        display: block;
+    }
+
+
+    .sidebar {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .header {
+        display: none;
+    }
+
+    .search-container {
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        gap: 10px;
+    }
+
+    .greeting {
+        position: static;
+        width: 100%;
+        max-width: 615px;
+        font-size: 28px;
+        line-height: 1.4;
+        text-align: center;
+        display: block;
+        margin: 0;
+        padding: 0 20px;
+        flex-shrink: 0;
+        background: linear-gradient(90deg, #9392AF 0%, #CDCDE5 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        transform: translate(20px, 11px);
+    }
+
+    .search-box {
+        width: calc(100% - 40px);
+        max-width: 615px;
+        height: 183px;
+        margin: 0;
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .search-input {
+        font-size: 18px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: calc(100% - 14px);
+        height: calc(100% - 14px);
+        text-align: left;
+        padding: 7px;
+    }
+
+    .search-input::placeholder {
+        text-align: center;
+    }
+
+    .raven-logo {
+        left: 0;
+        transform: none;
+    }
+}
