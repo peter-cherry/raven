@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { findEmail, verifyEmail, getAccountInfo } from '@/lib/hunter-verification'
 
+// Check if we should use mock mode
+function shouldUseMockMode(): boolean {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  const mockMode = process.env.NEXT_PUBLIC_MOCK_MODE === 'true'
+  return mockMode || !url || !serviceKey
+}
+
 // Initialize Supabase admin client lazily to handle missing env vars
 function getSupabaseClient(): SupabaseClient | null {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -36,11 +44,24 @@ function getSupabaseClient(): SupabaseClient | null {
  */
 export async function POST(request: NextRequest) {
   try {
+    // Mock mode - return fake verification results
+    if (shouldUseMockMode()) {
+      console.log('[Email Verify] Mock mode: returning fake results')
+      return NextResponse.json({
+        success: true,
+        verified: 0,
+        failed: 0,
+        results: [],
+        message: 'Mock mode - no actual verification performed',
+        mock: true
+      })
+    }
+
     const supabase = getSupabaseClient()
     if (!supabase) {
       return NextResponse.json({
         success: false,
-        error: 'Supabase not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY'
+        error: 'Supabase not configured'
       }, { status: 500 })
     }
 
@@ -220,6 +241,27 @@ export async function POST(request: NextRequest) {
  */
 export async function GET() {
   try {
+    // Mock mode - return fake stats
+    if (shouldUseMockMode()) {
+      return NextResponse.json({
+        success: true,
+        stats: {
+          pendingVerification: 25,
+          verified: 10,
+          attempted: 35,
+          lowConfidence: 5,
+          averageConfidence: 82
+        },
+        hunterAccount: {
+          searchesUsed: 50,
+          searchesAvailable: 450,
+          verificationsUsed: 20,
+          verificationsAvailable: 480
+        },
+        mock: true
+      })
+    }
+
     const supabase = getSupabaseClient()
     if (!supabase) {
       return NextResponse.json({

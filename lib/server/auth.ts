@@ -30,9 +30,11 @@ export interface OrgMembership {
   role: string;
 }
 
-// Check if running in mock mode
+// Check if running in mock mode (explicit flag OR missing credentials)
 function isMockMode(): boolean {
-  return process.env.NEXT_PUBLIC_MOCK_MODE === 'true';
+  const mockModeFlag = process.env.NEXT_PUBLIC_MOCK_MODE === 'true';
+  const missingCredentials = !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY;
+  return mockModeFlag || missingCredentials;
 }
 
 /**
@@ -70,6 +72,14 @@ export async function requireOrgMembership(
   userId: string,
   orgId: string
 ): Promise<OrgMembership> {
+  // Mock mode - allow any org ID
+  if (isMockMode()) {
+    return {
+      org_id: orgId,
+      role: 'owner',
+    };
+  }
+
   const { data: membership, error } = await supabase
     .from('org_memberships')
     .select('org_id, role')

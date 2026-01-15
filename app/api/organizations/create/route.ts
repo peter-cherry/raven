@@ -4,6 +4,14 @@ import { createClient } from '@supabase/supabase-js';
 // Force this route to use Node.js runtime (not Edge)
 export const runtime = 'nodejs';
 
+// Check if we should use mock mode (no Supabase configured)
+function shouldUseMockMode(): boolean {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const mockMode = process.env.NEXT_PUBLIC_MOCK_MODE === 'true';
+  return mockMode || !url || !serviceKey;
+}
+
 // Lazy initialization - create client only when needed
 function getSupabaseAdmin() {
   return createClient(
@@ -19,9 +27,21 @@ function getSupabaseAdmin() {
 }
 
 export async function POST(req: Request) {
-  const supabaseAdmin = getSupabaseAdmin();
   try {
     const { userId, userEmail } = await req.json();
+
+    // Mock mode - return fake org ID for testing without database
+    if (shouldUseMockMode()) {
+      console.log('[API /organizations/create] Mock mode: returning fake org');
+      return NextResponse.json({
+        success: true,
+        orgId: 'mock-org-' + Date.now(),
+        orgName: 'Mock Organization',
+        mock: true
+      });
+    }
+
+    const supabaseAdmin = getSupabaseAdmin();
 
     if (!userId || !userEmail) {
       return NextResponse.json(

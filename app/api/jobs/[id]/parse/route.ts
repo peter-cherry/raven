@@ -3,6 +3,14 @@ import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
+// Check if we should use mock mode (no Supabase configured)
+function shouldUseMockMode(): boolean {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const mockMode = process.env.NEXT_PUBLIC_MOCK_MODE === 'true';
+  return mockMode || !url || !serviceKey;
+}
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -16,6 +24,58 @@ export async function POST(
         { success: false, error: 'raw_text is required' },
         { status: 400 }
       );
+    }
+
+    // Mock mode - return fake parsed data for testing without database
+    if (shouldUseMockMode() || jobId.startsWith('mock-job-')) {
+      console.log('[parse] Mock mode: returning fake parsed data');
+      
+      // Call parsing API to get real AI-parsed data (if available) or use mock
+      let parsedData = {
+        job_title: 'Mock Work Order',
+        description: raw_text.substring(0, 200),
+        trade_needed: 'General',
+        address_text: '123 Main St, Austin, TX 78701',
+        scheduled_start_ts: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+        duration: 120,
+        urgency: 'normal',
+        budget_min: 100,
+        budget_max: 500,
+        pay_rate: null,
+        contact_name: 'John Doe',
+        contact_phone: '555-123-4567',
+        contact_email: 'john@example.com'
+      };
+
+      // Try to get real parsed data from the parse API
+      try {
+        const parseResponse = await fetch(
+          `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/work-orders/parse`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ raw_text }),
+          }
+        );
+        
+        if (parseResponse.ok) {
+          const parseResult = await parseResponse.json();
+          if (parseResult.data) {
+            parsedData = { ...parsedData, ...parseResult.data };
+          }
+        }
+      } catch (e) {
+        console.log('[parse] Mock mode: parsing API not available, using defaults');
+      }
+
+      return NextResponse.json({
+        success: true,
+        job_id: jobId,
+        parsed_data: parsedData,
+        geo_data: { lat: 30.2672, lng: -97.7431, city: 'Austin', state: 'TX' },
+        message: 'Mock job parsed successfully',
+        mock: true
+      });
     }
 
     // Development mode bypass - use service role key

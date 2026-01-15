@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 
 export interface Draft {
   id: string;
@@ -22,28 +22,34 @@ export function useMultipleDrafts({
 }: UseMultipleDraftsOptions) {
   const [drafts, setDrafts] = useState<Draft[]>([]);
 
-  // Load drafts on mount
-  useEffect(() => {
-    loadDrafts();
-  }, [key]);
-
-  const loadDrafts = () => {
+  // Helper to get drafts from localStorage without setting state
+  const getDraftsFromStorage = useCallback((): Draft[] => {
     try {
       const stored = localStorage.getItem(`drafts_${key}`);
       if (stored) {
-        const parsedDrafts = JSON.parse(stored);
-        setDrafts(parsedDrafts);
-        return parsedDrafts;
+        return JSON.parse(stored);
       }
     } catch (err) {
       console.error('Failed to load drafts:', err);
     }
     return [];
-  };
+  }, [key]);
 
-  const saveDraft = (data: any, title?: string, description?: string) => {
+  // Load drafts on mount
+  useEffect(() => {
+    const storedDrafts = getDraftsFromStorage();
+    setDrafts(storedDrafts);
+  }, [getDraftsFromStorage]);
+
+  const loadDrafts = useCallback(() => {
+    const storedDrafts = getDraftsFromStorage();
+    setDrafts(storedDrafts);
+    return storedDrafts;
+  }, [getDraftsFromStorage]);
+
+  const saveDraft = useCallback((data: any, title?: string, description?: string) => {
     try {
-      const existingDrafts = loadDrafts();
+      const existingDrafts = getDraftsFromStorage();
 
       // Create draft object
       const draft: Draft = {
@@ -71,16 +77,32 @@ export function useMultipleDrafts({
       console.error('Failed to save draft:', err);
       return null;
     }
-  };
+  }, [key, maxDrafts, getDraftsFromStorage]);
 
-  const updateDraft = (draftId: string, data: any, title?: string, description?: string) => {
+  const updateDraft = useCallback((draftId: string, data: any, title?: string, description?: string) => {
     try {
-      const existingDrafts = loadDrafts();
+      const existingDrafts = getDraftsFromStorage();
       const draftIndex = existingDrafts.findIndex((d: Draft) => d.id === draftId);
 
       if (draftIndex === -1) {
         // If draft doesn't exist, create a new one
-        return saveDraft(data, title, description);
+        const draft: Draft = {
+          id: `draft_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          title: title || data.job_title || 'Untitled Draft',
+          description: description || data.description || 'No description',
+          data,
+          timestamp: new Date().toISOString(),
+          lastModified: new Date().toISOString()
+        };
+
+        let updatedDrafts = [draft, ...existingDrafts];
+        if (updatedDrafts.length > maxDrafts) {
+          updatedDrafts = updatedDrafts.slice(0, maxDrafts);
+        }
+
+        localStorage.setItem(`drafts_${key}`, JSON.stringify(updatedDrafts));
+        setDrafts(updatedDrafts);
+        return draft;
       }
 
       // Update existing draft
@@ -93,18 +115,18 @@ export function useMultipleDrafts({
       };
 
       localStorage.setItem(`drafts_${key}`, JSON.stringify(existingDrafts));
-      setDrafts(existingDrafts);
+      setDrafts([...existingDrafts]);
 
       return existingDrafts[draftIndex];
     } catch (err) {
       console.error('Failed to update draft:', err);
       return null;
     }
-  };
+  }, [key, maxDrafts, getDraftsFromStorage]);
 
-  const deleteDraft = (draftId: string) => {
+  const deleteDraft = useCallback((draftId: string) => {
     try {
-      const existingDrafts = loadDrafts();
+      const existingDrafts = getDraftsFromStorage();
       const updatedDrafts = existingDrafts.filter((d: Draft) => d.id !== draftId);
 
       localStorage.setItem(`drafts_${key}`, JSON.stringify(updatedDrafts));
@@ -115,9 +137,9 @@ export function useMultipleDrafts({
       console.error('Failed to delete draft:', err);
       return false;
     }
-  };
+  }, [key, getDraftsFromStorage]);
 
-  const clearAllDrafts = () => {
+  const clearAllDrafts = useCallback(() => {
     try {
       localStorage.removeItem(`drafts_${key}`);
       setDrafts([]);
@@ -126,14 +148,14 @@ export function useMultipleDrafts({
       console.error('Failed to clear drafts:', err);
       return false;
     }
-  };
+  }, [key]);
 
-  const getDraft = (draftId: string): Draft | null => {
+  const getDraft = useCallback((draftId: string): Draft | null => {
     const draft = drafts.find(d => d.id === draftId);
     return draft || null;
-  };
+  }, [drafts]);
 
-  const getTimeSince = (timestamp: string): string => {
+  const getTimeSince = useCallback((timestamp: string): string => {
     const date = new Date(timestamp);
     const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
 
@@ -150,9 +172,10 @@ export function useMultipleDrafts({
     if (days < 7) return `${days}d ago`;
 
     return date.toLocaleDateString();
-  };
+  }, []);
 
-  return {
+  // Memoize the return object to prevent unnecessary re-renders
+  return useMemo(() => ({
     drafts,
     saveDraft,
     updateDraft,
@@ -163,5 +186,5 @@ export function useMultipleDrafts({
     getTimeSince,
     hasDrafts: drafts.length > 0,
     draftCount: drafts.length
-  };
+  }), [drafts, saveDraft, updateDraft, deleteDraft, clearAllDrafts, getDraft, loadDrafts, getTimeSince]);
 }

@@ -6,10 +6,17 @@ export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const path = req.nextUrl.pathname;
 
-  // Mock mode - skip all auth checks for local development
+  // Check if Supabase is configured
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const hasSupabaseConfig = Boolean(supabaseUrl && supabaseAnonKey);
+
+  // Mock mode or missing config - skip all auth checks
   const isMockMode = process.env.NEXT_PUBLIC_MOCK_MODE === 'true';
-  if (isMockMode) {
-    // In mock mode, allow all requests through
+  
+  // Skip auth if mock mode enabled OR Supabase not configured
+  if (isMockMode || !hasSupabaseConfig) {
+    // Allow all requests through without auth
     return res;
   }
 

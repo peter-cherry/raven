@@ -81,11 +81,12 @@ export default function ContractorCard({
   const coiStatus = getCoiStatus(insurance, jobDate);
 
   // COI status colors
+  // COI status colors - Design System
   const coiColors = {
-    expired: { bg: 'rgba(239, 68, 68, 0.2)', border: '#EF4444', text: '#EF4444' },
-    expiring_soon: { bg: 'rgba(251, 146, 60, 0.2)', border: '#FB923C', text: '#FB923C' },
-    valid: { bg: 'rgba(16, 185, 129, 0.2)', border: '#10B981', text: '#10B981' },
-    missing: { bg: 'rgba(156, 163, 175, 0.2)', border: '#9CA3AF', text: '#9CA3AF' }
+    expired: { bg: 'var(--ds-error-bg)', border: 'var(--ds-error-border)', text: 'var(--ds-error-text)' },
+    expiring_soon: { bg: 'var(--ds-warning-bg)', border: 'var(--ds-warning-border)', text: 'var(--ds-warning-text)' },
+    valid: { bg: 'var(--ds-success-bg)', border: 'var(--ds-success-border)', text: 'var(--ds-success-text)' },
+    missing: { bg: 'var(--ds-bg-muted)', border: 'var(--ds-border-default)', text: 'var(--ds-text-tertiary)' }
   };
 
   const coiStatusLabels = {
@@ -117,54 +118,53 @@ export default function ContractorCard({
 
   return (
     <motion.div
-      className="contractor-card"
+      className="contractor-card card"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1, duration: 0.3 }}
       onClick={handleCardClick}
       style={{
         background: isAssigned
-          ? 'rgba(16, 185, 129, 0.14)'
-          : (isMapExpanded ? 'var(--tech-card-bg)' : 'var(--tech-card-bg-collapsed)'),
-        backdropFilter: isMapExpanded ? 'blur(8px)' : 'none',
-        WebkitBackdropFilter: isMapExpanded ? 'blur(8px)' : 'none',
-        border: 'var(--container-border)',
-        borderRadius: 'var(--container-border-radius)',
-        padding: '16px',
+          ? 'var(--ds-success-bg)'
+          : 'var(--ds-bg-surface)',
+        border: isAssigned
+          ? '1px solid var(--ds-success-border)'
+          : '1px solid var(--ds-border-default)',
+        borderRadius: 'var(--ds-radius-lg)',
+        padding: 'var(--ds-space-4)',
         cursor: 'pointer',
-        transition: 'all 0.6s ease',
+        transition: 'all 0.2s ease',
         position: 'relative',
         overflow: 'visible',
         display: 'flex',
         flexDirection: 'column',
-        filter: 'brightness(1.15)'
+        boxShadow: 'var(--ds-shadow-sm)'
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.background = 'var(--tech-card-hover-bg)';
-        e.currentTarget.style.borderColor = 'var(--container-hover-border)';
+        e.currentTarget.style.background = 'var(--ds-bg-elevated)';
+        e.currentTarget.style.borderColor = 'var(--ds-border-strong)';
         e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.boxShadow = 'var(--ds-shadow-md)';
       }}
       onMouseLeave={(e) => {
-        const originalBg = isAssigned
-          ? 'rgba(16, 185, 129, 0.14)'
-          : (isMapExpanded ? 'var(--tech-card-bg)' : 'var(--tech-card-bg-collapsed)');
-        e.currentTarget.style.background = originalBg;
-        e.currentTarget.style.borderColor = 'var(--stroke-subtle)';
+        e.currentTarget.style.background = isAssigned ? 'var(--ds-success-bg)' : 'var(--ds-bg-surface)';
+        e.currentTarget.style.borderColor = isAssigned ? 'var(--ds-success-border)' : 'var(--ds-border-default)';
         e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = 'var(--ds-shadow-sm)';
       }}
     >
-      <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: 'var(--ds-space-4)', alignItems: 'center' }}>
         {/* Left Section: Profile Picture + Info */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--ds-space-3)', flex: 1, minWidth: 0 }}>
           {/* Profile Picture */}
           <div style={{
             width: 40,
             height: 40,
-            borderRadius: '50%',
-            border: 'var(--container-border)',
+            borderRadius: 'var(--ds-radius-full)',
+            border: '2px solid var(--ds-border-default)',
             overflow: 'hidden',
             flexShrink: 0,
-            background: 'var(--tech-avatar-bg)'
+            background: 'var(--ds-bg-muted)'
           }}>
             {index % 3 === 0 ? (
               <img
@@ -176,13 +176,13 @@ export default function ContractorCard({
               <div style={{
                 width: '100%',
                 height: '100%',
-                background: 'linear-gradient(135deg, var(--tech-gradient-overlay) 0%, rgba(178, 173, 201, 0.4) 100%)',
+                background: 'var(--ds-accent-secondary-light)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 'var(--font-xl)',
-                fontWeight: 700,
-                color: 'var(--text-primary)'
+                fontSize: 'var(--ds-text-base)',
+                fontWeight: 'var(--ds-font-bold)',
+                color: 'var(--ds-accent-secondary)'
               }}>
                 {name.substring(0, 2).toUpperCase()}
               </div>
@@ -196,13 +196,12 @@ export default function ContractorCard({
           </div>
 
           {/* Name, Distance, and Rating */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--ds-space-1)', flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--ds-space-2)' }}>
               <div style={{
-                fontFamily: 'Inter, sans-serif',
-                fontWeight: 700,
-                fontSize: 14,
-                color: '#FFFFFF',
+                fontWeight: 'var(--ds-font-semibold)',
+                fontSize: 'var(--ds-text-sm)',
+                color: 'var(--ds-text-primary)',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap'
@@ -210,27 +209,24 @@ export default function ContractorCard({
                 {name}
               </div>
               {/* Rating Badge */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--ds-space-1)', flexShrink: 0 }}>
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                   <path d="M6 1L7.545 4.13L11 4.635L8.5 7.07L9.09 10.51L6 8.885L2.91 10.51L3.5 7.07L1 4.635L4.455 4.13L6 1Z"
-                    fill={rating >= 4.5 ? 'var(--tech-rating-high)' : 'var(--tech-rating-medium)'}
+                    fill={rating >= 4.5 ? 'var(--ds-success)' : 'var(--ds-warning)'}
                   />
                 </svg>
                 <span style={{
-                  fontFamily: 'var(--font-text-body)',
-                  fontWeight: 600,
-                  fontSize: 12,
-                  color: rating >= 4.5 ? 'var(--tech-rating-high)' : 'var(--tech-rating-medium)'
+                  fontWeight: 'var(--ds-font-semibold)',
+                  fontSize: 'var(--ds-text-xs)',
+                  color: rating >= 4.5 ? 'var(--ds-success-text)' : 'var(--ds-warning-text)'
                 }}>
                   {rating.toFixed(1)}
                 </span>
               </div>
             </div>
             <div style={{
-              fontFamily: 'Inter, sans-serif',
-              fontWeight: 400,
-              fontSize: 12,
-              color: '#FFFFFF'
+              fontSize: 'var(--ds-text-xs)',
+              color: 'var(--ds-text-secondary)'
             }}>
               {distance.toFixed(1)} mi away
             </div>
@@ -238,22 +234,17 @@ export default function ContractorCard({
         </div>
 
         {/* Right Section: Skills, Certifications, COI, and Button */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'flex-end', maxWidth: '50%' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--ds-space-3)', justifyContent: 'flex-end', maxWidth: '50%' }}>
           {/* Badges Container */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--ds-space-2)', justifyContent: 'flex-end' }}>
             {/* Trade Skills */}
             {skills.map((skill, idx) => (
               <span
                 key={`skill-${idx}`}
+                className="badge badge-default"
                 style={{
-                  fontFamily: 'var(--font-text-body)',
-                  fontSize: 'var(--font-xs)',
-                  fontWeight: 500,
-                  color: 'var(--text-primary)',
-                  background: 'var(--tech-skill-badge-bg)',
-                  border: '1px solid var(--tech-skill-badge-border)',
-                  borderRadius: 4,
-                  padding: '2px 8px',
+                  fontSize: 'var(--ds-text-xs)',
+                  fontWeight: 'var(--ds-font-medium)',
                   whiteSpace: 'nowrap'
                 }}
               >
@@ -265,15 +256,10 @@ export default function ContractorCard({
             {certifications.slice(0, 2).map((cert) => (
               <span
                 key={cert.id}
+                className="badge badge-info"
                 style={{
-                  fontFamily: 'var(--font-text-body)',
-                  fontSize: 'var(--font-xs)',
-                  fontWeight: 500,
-                  color: '#FFFFFF',
-                  background: 'rgba(59, 130, 246, 0.2)',
-                  border: '1px solid rgba(59, 130, 246, 0.4)',
-                  borderRadius: 4,
-                  padding: '2px 8px',
+                  fontSize: 'var(--ds-text-xs)',
+                  fontWeight: 'var(--ds-font-medium)',
                   whiteSpace: 'nowrap'
                 }}
                 title={cert.expirationDate ? `Expires: ${new Date(cert.expirationDate).toLocaleDateString()}` : ''}
@@ -286,13 +272,12 @@ export default function ContractorCard({
             {certifications.length > 2 && (
               <span
                 style={{
-                  fontFamily: 'var(--font-text-body)',
-                  fontSize: 'var(--font-xs)',
-                  fontWeight: 500,
-                  color: 'var(--text-secondary)',
-                  background: 'rgba(255, 255, 255, 0.05)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: 4,
+                  fontSize: 'var(--ds-text-xs)',
+                  fontWeight: 'var(--ds-font-medium)',
+                  color: 'var(--ds-text-secondary)',
+                  background: 'var(--ds-bg-muted)',
+                  border: '1px solid var(--ds-border-default)',
+                  borderRadius: 'var(--ds-radius-sm)',
                   padding: '2px 8px',
                   whiteSpace: 'nowrap'
                 }}
@@ -304,13 +289,12 @@ export default function ContractorCard({
             {/* COI Status Badge */}
             <span
               style={{
-                fontFamily: 'var(--font-text-body)',
-                fontSize: 'var(--font-xs)',
-                fontWeight: 600,
+                fontSize: 'var(--ds-text-xs)',
+                fontWeight: 'var(--ds-font-semibold)',
                 color: coiColors[coiStatus].text,
                 background: coiColors[coiStatus].bg,
                 border: `1px solid ${coiColors[coiStatus].border}`,
-                borderRadius: 4,
+                borderRadius: 'var(--ds-radius-sm)',
                 padding: '2px 8px',
                 whiteSpace: 'nowrap',
                 textTransform: 'uppercase',
@@ -326,29 +310,10 @@ export default function ContractorCard({
           {showAssignButton ? (
             <button
               onClick={handleVisitProfile}
+              className="btn btn-secondary btn-sm"
               style={{
-                fontFamily: 'var(--font-text-body)',
-                fontSize: 'var(--font-sm)',
-                fontWeight: 'var(--font-weight-semibold)',
-                color: 'var(--text-primary)',
-                background: 'transparent',
-                border: '1px solid rgba(249, 243, 229, 0.5)',
-                borderRadius: 6,
-                padding: '6px 16px',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
                 whiteSpace: 'nowrap',
                 flexShrink: 0
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(249, 243, 229, 0.1)';
-                e.currentTarget.style.borderColor = 'rgba(249, 243, 229, 0.8)';
-                e.currentTarget.style.transform = 'translateY(-1px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.borderColor = 'rgba(249, 243, 229, 0.5)';
-                e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
               Visit Profile
@@ -360,11 +325,10 @@ export default function ContractorCard({
       {/* Hover indicator */}
       <div style={{
         position: 'absolute',
-        bottom: 8,
-        right: 8,
-        fontFamily: 'var(--font-text-body)',
-        fontSize: 'var(--font-xs)',
-        color: 'var(--text-placeholder)',
+        bottom: 'var(--ds-space-2)',
+        right: 'var(--ds-space-2)',
+        fontSize: 'var(--ds-text-xs)',
+        color: 'var(--ds-text-tertiary)',
         opacity: 0,
         transition: 'opacity 0.2s'
       }}

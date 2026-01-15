@@ -7,25 +7,38 @@ import { cookies } from 'next/headers';
 const DEV_ORG_ID = '152ca2e3-a371-4167-99c5-0890afcd83d7';
 const DEV_USER_ID = '00000000-0000-0000-0000-000000000001';
 
+// Check if we should use mock mode (no Supabase configured)
+function shouldUseMockMode(): boolean {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const mockMode = process.env.NEXT_PUBLIC_MOCK_MODE === 'true';
+  return mockMode || !url || !serviceKey;
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const isDevelopment = process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_MOCK_MODE === 'true';
+    const { org_id: requestedOrgId } = await request.json();
+    
+    // Mock mode - return fake job ID for testing without database
+    if (shouldUseMockMode()) {
+      console.log('[create-empty] Mock mode: returning fake job');
+      const mockJobId = `mock-job-${Date.now()}`;
+      return NextResponse.json({
+        success: true,
+        job_id: mockJobId,
+        mock: true
+      });
+    }
+
+    const isDevelopment = process.env.NODE_ENV === 'development';
     let supabase: any;
     let userId: string;
 
     // Always use service role in development to bypass RLS
     if (isDevelopment) {
       console.log('[create-empty] Dev mode: using service role key');
-      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-      
-      if (!url || !serviceKey) {
-        console.error('[create-empty] Missing Supabase env vars');
-        return NextResponse.json({ 
-          error: 'Supabase not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY' 
-        }, { status: 500 });
-      }
-      
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+      const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
       supabase = createClient(url, serviceKey);
       userId = DEV_USER_ID;
     } else {
@@ -39,8 +52,6 @@ export async function POST(request: NextRequest) {
       }
       userId = user.id;
     }
-
-    const { org_id: requestedOrgId } = await request.json();
     
     // Use provided org_id or fallback to dev org in development
     const org_id = requestedOrgId || (isDevelopment ? DEV_ORG_ID : null);

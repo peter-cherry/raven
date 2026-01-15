@@ -7,15 +7,28 @@
  * 3. Move to Cold Leads - Insert verified records for dispatch
  */
 
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { selectContractors, SelectionCriteria, LicenseRecord } from './ai-lead-selector'
 import { findEmail, getAccountInfo } from './hunter-verification'
 
-// Initialize Supabase admin client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+// Check if we should use mock mode
+function isMockMode(): boolean {
+  const mockModeFlag = process.env.NEXT_PUBLIC_MOCK_MODE === 'true';
+  const missingCredentials = !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY;
+  return mockModeFlag || missingCredentials;
+}
+
+// Lazy initialization - create client only when needed
+let _supabase: SupabaseClient | null = null;
+function getSupabase(): SupabaseClient {
+  if (!_supabase) {
+    _supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+  }
+  return _supabase;
+}
 
 export interface PipelineJob {
   id: string
@@ -56,6 +69,20 @@ export async function runLeadPipeline(
   job: PipelineJob,
   config: PipelineConfig = {}
 ): Promise<PipelineResult> {
+  // Mock mode - return mock result without database
+  if (isMockMode()) {
+    console.log(`[Lead Pipeline] Mock mode - skipping pipeline for job ${job.id}`)
+    return {
+      success: true,
+      pipelineRan: false,
+      selected: 0,
+      verified: 0,
+      movedToCold: 0,
+      coldLeadIds: [],
+      skippedReason: 'Mock mode - pipeline skipped'
+    }
+  }
+
   const {
     selectLimit = 20,
     verifyLimit = 10,
@@ -65,6 +92,9 @@ export async function runLeadPipeline(
 
   console.log(`[Lead Pipeline] Starting for job ${job.id}`)
   console.log(`[Lead Pipeline] Criteria: ${job.trade_needed} in ${job.city}, ${job.state}`)
+
+  // Get Supabase client (lazy initialization)
+  const supabase = getSupabase()
 
   try {
     // Check if we should skip based on existing cold leads
@@ -429,7 +459,21 @@ export async function getPipelineStatus(jobId: string): Promise<{
   pendingVerification?: number
   readyToMove?: number
 }> {
+  // Mock mode - return mock status
+  if (isMockMode()) {
+    return {
+      canRun: false,
+      reason: 'Mock mode - pipeline disabled',
+      hunterCredits: 0,
+      pendingVerification: 0,
+      readyToMove: 0
+    }
+  }
+
   try {
+    // Get Supabase client
+    const supabase = getSupabase()
+
     // Check Hunter.io credits
     const accountInfo = await getAccountInfo()
     const hunterCredits = accountInfo.searches?.available || 0

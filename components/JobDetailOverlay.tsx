@@ -134,56 +134,48 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
 
-  const statusColors: Record<string, string> = {
-    pending: 'rgba(138, 134, 219, 0.5)',     // 50% opacity
-    unassigned: 'rgba(138, 134, 219, 0.5)',  // Same as pending
-    assigned: 'rgba(247, 177, 60, 0.5)',     // 50% opacity
-    completed: 'rgba(60, 200, 150, 0.5)',    // 50% opacity
-    archived: 'rgba(179, 179, 186, 0.5)',    // 50% opacity
-  };
-
   const status = currentStatus.toLowerCase();
-  const statusColor = statusColors[status] || statusColors.pending;
 
-  // Get color palette based on status
+  // Get color palette based on status - Light Theme Design System
   const getColorPalette = (status: string) => {
     const statusLower = status.toLowerCase();
 
     if (statusLower === 'assigned' || statusLower === 'active' || statusLower === 'in_progress') {
-      // Orange fills for assigned - 50% reduced opacity (0.2 → 0.1)
       return {
-        background: 'rgba(245, 158, 11, 0.1)',  // Orange tint 50% reduced
-        border: 'rgba(249, 243, 229, 0.33)',  // Same stroke as unassigned
-        cardBg: 'rgba(245, 158, 11, 0.1)',  // Orange card backgrounds 50% reduced
-        statusBorder: 'rgba(247, 177, 60, 0.5)',  // Status badge uses orange with 50% opacity
-        labelColor: 'rgba(245, 158, 11, 0.9)'  // Orange labels with high opacity
+        background: 'var(--ds-warning-bg)',
+        border: 'var(--ds-border-default)',
+        cardBg: 'var(--ds-warning-bg)',
+        statusBorder: 'var(--ds-warning-border)',
+        labelColor: 'var(--ds-warning-text)',
+        badgeClass: 'badge-warning'
       };
     } else if (statusLower === 'completed') {
-      // Green fills for completed - 50% reduced opacity (0.14 → 0.07)
       return {
-        background: 'rgba(16, 185, 129, 0.07)',
-        border: 'rgba(249, 243, 229, 0.33)',
-        cardBg: 'rgba(16, 185, 129, 0.07)',
-        statusBorder: 'rgba(60, 200, 150, 0.5)',  // 50% opacity
-        labelColor: 'rgba(16, 185, 129, 0.9)'
+        background: 'var(--ds-success-bg)',
+        border: 'var(--ds-border-default)',
+        cardBg: 'var(--ds-success-bg)',
+        statusBorder: 'var(--ds-success-border)',
+        labelColor: 'var(--ds-success-text)',
+        badgeClass: 'badge-success'
       };
     } else if (statusLower === 'archived') {
-      // Gray fills for archived - 50% reduced opacity (0.2 → 0.1)
       return {
-        background: 'rgba(160, 160, 168, 0.1)',
-        border: 'rgba(249, 243, 229, 0.33)',
-        cardBg: 'rgba(160, 160, 168, 0.1)',
-        statusBorder: 'rgba(179, 179, 186, 0.5)',  // 50% opacity
-        labelColor: 'rgba(160, 160, 168, 0.9)'
+        background: 'var(--ds-bg-muted)',
+        border: 'var(--ds-border-default)',
+        cardBg: 'var(--ds-bg-elevated)',
+        statusBorder: 'var(--ds-border-strong)',
+        labelColor: 'var(--ds-text-tertiary)',
+        badgeClass: 'badge-default'
       };
     } else {
-      // Purple fills for unassigned/pending - 50% reduced opacity (0.2 → 0.1)
+      // Default: pending/matching/unassigned - use accent secondary (violet)
       return {
-        background: 'rgba(101, 98, 144, 0.1)',
-        border: 'rgba(249, 243, 229, 0.33)',
-        cardBg: 'rgba(101, 98, 144, 0.1)',
-        statusBorder: 'rgba(138, 134, 219, 0.5)',  // 50% opacity
-        labelColor: '#ADA9DB'  // Purple labels
+        background: 'var(--ds-accent-secondary-light)',
+        border: 'var(--ds-border-default)',
+        cardBg: 'var(--ds-bg-surface)',
+        statusBorder: 'var(--ds-accent-secondary)',
+        labelColor: 'var(--ds-accent-secondary)',
+        badgeClass: 'badge-primary'
       };
     }
   };
@@ -330,10 +322,10 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
     const maptilerKey = process.env.NEXT_PUBLIC_MAPTILER_KEY;
     const initialCenter: [number, number] = [-98.5795, 39.8283]; // Center of US
 
-    // Create map with custom purple styling
+    // Create map with light theme styling
     mapRef.current = new maplibregl.Map({
       container: mapContainerRef.current,
-      style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${maptilerKey}`,
+      style: `https://api.maptiler.com/maps/streets-v2-light/style.json?key=${maptilerKey}`,
       center: initialCenter,
       zoom: 16,
       attributionControl: false
@@ -358,7 +350,8 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
       const style = mapRef.current.getStyle();
       const layers = style.layers;
 
-      // Apply custom styling to map layers
+      // Apply custom styling to map layers - Light Theme
+      // Using the light map base, we only need minimal overrides
       layers?.forEach((layer: any) => {
         const isRoad = layer.type === 'line' &&
           (layer.id.includes('road') || layer.id.includes('highway') || layer.id.includes('Highway') ||
@@ -370,70 +363,48 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
         const isHousenumber = layer.id === 'Housenumber';
         const isRoadLabel = layer.id === 'Road labels';
 
-        const isLand = layer.type === 'fill' &&
-          (layer.id.includes('Residential') || layer.id.includes('Industrial') ||
-           layer.id.includes('Grass') || layer.id.includes('Park') ||
-           layer.id.includes('Pedestrian') || layer.id.includes('Cemetery') ||
-           layer.id.includes('Hospital') || layer.id.includes('Stadium') ||
-           layer.id.includes('School') || layer.id.includes('Airport'));
-
+        // For light theme, we keep most layers at default
+        // Only adjust roads to be slightly more visible
         if (isRoad) {
           try {
-            mapRef.current?.setPaintProperty(layer.id, 'line-color', '#d4d4d4');
-            mapRef.current?.setPaintProperty(layer.id, 'line-opacity', 0.4);
+            mapRef.current?.setPaintProperty(layer.id, 'line-color', '#94a3b8');
+            mapRef.current?.setPaintProperty(layer.id, 'line-opacity', 0.7);
           } catch (e) {}
         } else if (isBuilding) {
           try {
-            const buildingColor = layer.id === 'Building 3D' ? '#d4d4d4' : '#b8b8b8';
+            const buildingColor = '#e2e8f0';
             if (layer.id === 'Building 3D') {
               mapRef.current?.setPaintProperty(layer.id, 'fill-extrusion-color', buildingColor);
-              mapRef.current?.setPaintProperty(layer.id, 'fill-extrusion-opacity', 0.6);
+              mapRef.current?.setPaintProperty(layer.id, 'fill-extrusion-opacity', 0.7);
             } else {
               mapRef.current?.setPaintProperty(layer.id, 'fill-color', buildingColor);
-              mapRef.current?.setPaintProperty(layer.id, 'fill-opacity', 0.6);
+              mapRef.current?.setPaintProperty(layer.id, 'fill-opacity', 0.7);
             }
           } catch (e) {}
         } else if (isHousenumber) {
           try {
-            mapRef.current?.setPaintProperty(layer.id, 'text-color', '#FFFFFF');
-            mapRef.current?.setPaintProperty(layer.id, 'text-halo-color', 'rgba(47, 47, 47, 0.8)');
+            mapRef.current?.setPaintProperty(layer.id, 'text-color', '#52525b');
+            mapRef.current?.setPaintProperty(layer.id, 'text-halo-color', 'rgba(255, 255, 255, 0.8)');
             mapRef.current?.setPaintProperty(layer.id, 'text-halo-width', 1.5);
             mapRef.current?.setPaintProperty(layer.id, 'text-opacity', 1);
           } catch (e) {}
         } else if (isRoadLabel) {
           try {
-            mapRef.current?.setPaintProperty(layer.id, 'text-color', '#ffffff');
-            mapRef.current?.setPaintProperty(layer.id, 'text-halo-width', 0);
+            mapRef.current?.setPaintProperty(layer.id, 'text-color', '#52525b');
+            mapRef.current?.setPaintProperty(layer.id, 'text-halo-color', '#ffffff');
+            mapRef.current?.setPaintProperty(layer.id, 'text-halo-width', 1);
             mapRef.current?.setPaintProperty(layer.id, 'text-opacity', 1);
-          } catch (e) {}
-        } else if (isLand) {
-          try {
-            mapRef.current?.setPaintProperty(layer.id, 'fill-color', '#d4d4d4');
-            mapRef.current?.setPaintProperty(layer.id, 'fill-opacity', 0.2);
-          } catch (e) {}
-        } else {
-          try {
-            if (layer.type === 'fill') {
-              mapRef.current?.setPaintProperty(layer.id, 'fill-opacity', 0);
-            } else if (layer.type === 'line') {
-              mapRef.current?.setPaintProperty(layer.id, 'line-opacity', 0);
-            } else if (layer.type === 'symbol') {
-              mapRef.current?.setPaintProperty(layer.id, 'text-opacity', 0);
-              mapRef.current?.setPaintProperty(layer.id, 'icon-opacity', 0);
-            } else if (layer.type === 'background') {
-              mapRef.current?.setPaintProperty(layer.id, 'background-opacity', 0);
-            }
           } catch (e) {}
         }
       });
 
-      // Add white job location marker (30% smaller)
+      // Add job location marker with primary blue color for visibility on light map
       const jobMarkerEl = document.createElement('div');
-      jobMarkerEl.style.width = '21.7px'; // 31 * 0.7
-      jobMarkerEl.style.height = '28px'; // 40 * 0.7
+      jobMarkerEl.style.width = '21.7px';
+      jobMarkerEl.style.height = '28px';
       jobMarkerEl.innerHTML = `
         <svg width="21.7" height="28" viewBox="0 0 31 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path fill-rule="evenodd" clip-rule="evenodd" d="M15.4766 4C9.066 4 3.86916 9.37258 3.86916 16C3.86916 18.0557 4.57324 20.3536 5.76796 22.7356C6.95398 25.1003 8.5578 27.4183 10.199 29.4786C11.8354 31.5329 13.4773 33.2914 14.7121 34.5376C14.9897 34.8178 15.2461 35.0715 15.4766 35.2962C15.7071 35.0715 15.9636 34.8178 16.2412 34.5376C17.476 33.2914 19.1179 31.5329 20.7543 29.4786C22.3955 27.4183 23.9993 25.1003 25.1853 22.7356C26.38 20.3536 27.0841 18.0557 27.0841 16C27.0841 9.37258 21.8873 4 15.4766 4ZM15.4766 38C14.2176 39.5185 14.2173 39.5182 14.2169 39.5179L14.2128 39.5142L14.203 39.5055L14.1691 39.4752C14.1402 39.4492 14.0988 39.4118 14.0457 39.3635C13.9396 39.2669 13.7869 39.1264 13.5941 38.9454C13.2088 38.5836 12.6627 38.0593 12.0093 37.3999C10.705 36.0836 8.96131 34.2171 7.21225 32.0214C5.4679 29.8317 3.68621 27.2747 2.33309 24.5769C0.988679 21.8964 0 18.9443 0 16C0 7.16344 6.92913 0 15.4766 0C24.0241 0 30.9533 7.16344 30.9533 16C30.9533 18.9443 29.9646 21.8964 28.6202 24.5769C27.2671 27.2747 25.4854 29.8317 23.741 32.0214C21.992 34.2171 20.2483 36.0836 18.944 37.3999C18.2906 38.0593 17.7445 38.5836 17.3591 38.9454C17.1664 39.1264 17.0136 39.2669 16.9075 39.3635C16.8545 39.4118 16.8131 39.4492 16.7842 39.4752L16.7502 39.5055L16.7405 39.5142L16.7374 39.5169C16.737 39.5173 16.7356 39.5185 15.4766 38ZM15.4766 38L14.2169 39.5179C14.9414 40.1598 16.0112 40.1605 16.7356 39.5185L15.4766 38ZM15.4766 12C13.3398 12 11.6075 13.7909 11.6075 16C11.6075 18.2091 13.3398 20 15.4766 20C17.6135 20 19.3458 18.2091 19.3458 16C19.3458 13.7909 17.6135 12 15.4766 12ZM7.73832 16C7.73832 11.5817 11.2029 8 15.4766 8C19.7504 8 23.215 11.5817 23.215 16C23.215 20.4183 19.7504 24 15.4766 24C11.2029 24 7.73832 20.4183 7.73832 16Z" fill="#FFFFFF"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M15.4766 4C9.066 4 3.86916 9.37258 3.86916 16C3.86916 18.0557 4.57324 20.3536 5.76796 22.7356C6.95398 25.1003 8.5578 27.4183 10.199 29.4786C11.8354 31.5329 13.4773 33.2914 14.7121 34.5376C14.9897 34.8178 15.2461 35.0715 15.4766 35.2962C15.7071 35.0715 15.9636 34.8178 16.2412 34.5376C17.476 33.2914 19.1179 31.5329 20.7543 29.4786C22.3955 27.4183 23.9993 25.1003 25.1853 22.7356C26.38 20.3536 27.0841 18.0557 27.0841 16C27.0841 9.37258 21.8873 4 15.4766 4ZM15.4766 38C14.2176 39.5185 14.2173 39.5182 14.2169 39.5179L14.2128 39.5142L14.203 39.5055L14.1691 39.4752C14.1402 39.4492 14.0988 39.4118 14.0457 39.3635C13.9396 39.2669 13.7869 39.1264 13.5941 38.9454C13.2088 38.5836 12.6627 38.0593 12.0093 37.3999C10.705 36.0836 8.96131 34.2171 7.21225 32.0214C5.4679 29.8317 3.68621 27.2747 2.33309 24.5769C0.988679 21.8964 0 18.9443 0 16C0 7.16344 6.92913 0 15.4766 0C24.0241 0 30.9533 7.16344 30.9533 16C30.9533 18.9443 29.9646 21.8964 28.6202 24.5769C27.2671 27.2747 25.4854 29.8317 23.741 32.0214C21.992 34.2171 20.2483 36.0836 18.944 37.3999C18.2906 38.0593 17.7445 38.5836 17.3591 38.9454C17.1664 39.1264 17.0136 39.2669 16.9075 39.3635C16.8545 39.4118 16.8131 39.4492 16.7842 39.4752L16.7502 39.5055L16.7405 39.5142L16.7374 39.5169C16.737 39.5173 16.7356 39.5185 15.4766 38ZM15.4766 38L14.2169 39.5179C14.9414 40.1598 16.0112 40.1605 16.7356 39.5185L15.4766 38ZM15.4766 12C13.3398 12 11.6075 13.7909 11.6075 16C11.6075 18.2091 13.3398 20 15.4766 20C17.6135 20 19.3458 18.2091 19.3458 16C19.3458 13.7909 17.6135 12 15.4766 12ZM7.73832 16C7.73832 11.5817 11.2029 8 15.4766 8C19.7504 8 23.215 11.5817 23.215 16C23.215 20.4183 19.7504 24 15.4766 24C11.2029 24 7.73832 20.4183 7.73832 16Z" fill="#2563eb" stroke="#ffffff" stroke-width="1"/>
         </svg>
       `;
 
@@ -541,9 +512,9 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
                   'line-cap': 'round'
                 },
                 paint: {
-                  'line-color': '#FFFFFF',
-                  'line-width': 3,
-                  'line-opacity': 0.8
+                  'line-color': '#2563eb',
+                  'line-width': 4,
+                  'line-opacity': 0.9
                 }
               });
               console.log('[MAP] Road route added successfully');
@@ -567,46 +538,51 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
 
   return (
     <motion.div
-      className="policy-modal-overlay"
+      className="modal-backdrop"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
       onClick={onClose}
       style={{
-        background: 'transparent',
+        background: 'rgba(0, 0, 0, 0.4)',
         zIndex: 10002,
-        pointerEvents: 'auto'
+        pointerEvents: 'auto',
+        position: 'fixed',
+        inset: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 'var(--ds-space-6)'
       }}
     >
       <motion.div
-        className="policy-modal-card"
-        initial={{ scale: 0.5, opacity: 0 }}
+        className="modal modal--xl"
+        initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.5, opacity: 0 }}
+        exit={{ scale: 0.95, opacity: 0 }}
         transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
         onClick={(e) => e.stopPropagation()}
         style={{
           maxWidth: 1100,
           maxHeight: '90vh',
-          border: `1px solid ${colorPalette.border}`,
-          borderRadius: 'var(--modal-border-radius)',
+          border: '1px solid var(--ds-border-default)',
+          borderRadius: 'var(--ds-radius-2xl)',
           overflow: 'auto',
-          padding: 'var(--spacing-2xl)',
+          padding: 'var(--ds-space-6)',
           position: 'relative',
-          background: colorPalette.background,
-          backdropFilter: 'var(--modal-backdrop-blur)',
-          WebkitBackdropFilter: 'var(--modal-backdrop-blur)',
-          transition: 'background 0.6s ease, border-color 0.6s ease'
+          background: 'var(--ds-bg-surface)',
+          boxShadow: 'var(--ds-shadow-xl)',
+          transition: 'background 0.3s ease'
         }}
       >
         {/* Action Buttons - Close and Refresh */}
         <div style={{
           position: 'absolute',
-          top: 'var(--spacing-lg)',
-          right: 'var(--spacing-lg)',
+          top: 'var(--ds-space-4)',
+          right: 'var(--ds-space-4)',
           display: 'flex',
-          gap: 'var(--spacing-sm)',
+          gap: 'var(--ds-space-2)',
           alignItems: 'center'
         }}>
           {/* View Details Button - Shows full work order text */}
@@ -615,9 +591,14 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
               e.stopPropagation();
               setShowFullWorkOrder(true);
             }}
-            className="close-button"
+            className="btn btn-ghost"
             aria-label="View full work order"
-            style={{ marginRight: 0 }}
+            style={{ 
+              width: 40, 
+              height: 40, 
+              padding: 0,
+              borderRadius: 'var(--ds-radius-full)'
+            }}
           >
             <svg
               width="20"
@@ -628,14 +609,14 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
             >
               <path
                 d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-                stroke="white"
+                stroke="var(--ds-text-secondary)"
                 strokeWidth="1.4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
               <polyline
                 points="14 2 14 8 20 8"
-                stroke="white"
+                stroke="var(--ds-text-secondary)"
                 strokeWidth="1.4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -645,7 +626,7 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
                 y1="13"
                 x2="8"
                 y2="13"
-                stroke="white"
+                stroke="var(--ds-text-secondary)"
                 strokeWidth="1.4"
                 strokeLinecap="round"
               />
@@ -654,7 +635,7 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
                 y1="17"
                 x2="8"
                 y2="17"
-                stroke="white"
+                stroke="var(--ds-text-secondary)"
                 strokeWidth="1.4"
                 strokeLinecap="round"
               />
@@ -668,14 +649,11 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
                 e.stopPropagation();
 
                 try {
-                  // First check if there's an assigned technician
                   if (!assignedTechId) {
                     alert('Please assign a technician before marking the job as complete.');
                     return;
                   }
 
-                  // Use authoritative API route for completion
-                  console.log('[COMPLETE] Calling /api/jobs/:id/complete...');
                   const response = await fetch(`/api/jobs/${job.id}/complete`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -684,26 +662,21 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
 
                   if (!response.ok) {
                     const errorData = await response.json();
-                    console.error('[COMPLETE] API error:', errorData);
                     alert('Failed to mark job as complete: ' + (errorData.error || 'Unknown error'));
                     return;
                   }
 
-                  console.log('[COMPLETE] Job marked as complete');
                   setCurrentStatus('completed');
 
-                  // Check if rating already exists
                   const ratingResponse = await fetch(`/api/jobs/${job.id}/rate`);
                   const ratingData = await ratingResponse.json();
 
                   if (!ratingData.hasRating) {
-                    // Show rating modal if no rating exists
                     setShowRatingModal(true);
                   } else {
                     setHasExistingRating(true);
                   }
 
-                  // Trigger refresh to update job list
                   if (onStatusChange) {
                     onStatusChange();
                   }
@@ -712,26 +685,14 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
                   alert('Failed to mark job as complete');
                 }
               }}
+              className="btn btn-ghost"
               style={{
                 width: 40,
                 height: 40,
-                background: 'transparent',
-                border: '1px solid #10B981',
-                borderRadius: '50%',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.2s',
-                marginRight: 'var(--spacing-sm)'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(16, 185, 129, 0.1)';
-                e.currentTarget.style.borderColor = '#3CC896';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.borderColor = '#10B981';
+                padding: 0,
+                borderRadius: 'var(--ds-radius-full)',
+                border: '1px solid var(--ds-success)',
+                color: 'var(--ds-success)'
               }}
               title="Mark as Complete"
             >
@@ -740,7 +701,7 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
                 height="20"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#10B981"
+                stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -756,9 +717,15 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
               e.stopPropagation();
               setShowDeleteConfirm(true);
             }}
-            className="close-button"
+            className="btn btn-ghost"
             aria-label="Delete work order"
-            style={{ marginRight: 0 }}
+            style={{ 
+              width: 40, 
+              height: 40, 
+              padding: 0,
+              borderRadius: 'var(--ds-radius-full)',
+              color: 'var(--ds-error)'
+            }}
           >
             <svg
               width="20"
@@ -769,7 +736,7 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
             >
               <path
                 d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
-                stroke="white"
+                stroke="currentColor"
                 strokeWidth="1.4"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -779,7 +746,7 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
                 y1="11"
                 x2="10"
                 y2="17"
-                stroke="white"
+                stroke="currentColor"
                 strokeWidth="1.4"
                 strokeLinecap="round"
               />
@@ -788,7 +755,7 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
                 y1="11"
                 x2="14"
                 y2="17"
-                stroke="white"
+                stroke="currentColor"
                 strokeWidth="1.4"
                 strokeLinecap="round"
               />
@@ -1062,15 +1029,15 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
           </h1>
 
           {/* Quick Info Cards - Compact 3-column layout */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--spacing-md)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--ds-space-4)' }}>
             {/* Trade Card */}
             <div
+              className="card"
               style={{
-                background: colorPalette.cardBg,
-                border: 'var(--container-border)',
-                borderRadius: 'var(--container-border-radius)',
-                padding: 'var(--spacing-md)',
-                transition: 'background 0.6s ease'
+                background: 'var(--ds-bg-surface)',
+                border: '1px solid var(--ds-border-default)',
+                borderRadius: 'var(--ds-radius-lg)',
+                padding: 'var(--ds-space-4)'
               }}
             >
               <div style={{
@@ -1098,12 +1065,12 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
 
             {/* Location Card */}
             <div
+              className="card"
               style={{
-                background: colorPalette.cardBg,
-                border: 'var(--container-border)',
-                borderRadius: 'var(--container-border-radius)',
-                padding: 'var(--spacing-md)',
-                transition: 'background 0.6s ease'
+                background: 'var(--ds-bg-surface)',
+                border: '1px solid var(--ds-border-default)',
+                borderRadius: 'var(--ds-radius-lg)',
+                padding: 'var(--ds-space-4)'
               }}
             >
               <div style={{
@@ -1131,12 +1098,12 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
 
             {/* Scheduled Date Card */}
             <div
+              className="card"
               style={{
-                background: colorPalette.cardBg,
-                border: 'var(--container-border)',
-                borderRadius: 'var(--container-border-radius)',
-                padding: 'var(--spacing-md)',
-                transition: 'background 0.6s ease'
+                background: 'var(--ds-bg-surface)',
+                border: '1px solid var(--ds-border-default)',
+                borderRadius: 'var(--ds-radius-lg)',
+                padding: 'var(--ds-space-4)'
               }}
             >
               <div style={{
@@ -1182,12 +1149,12 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
             {/* Urgency Card */}
             {job.urgency && (
               <div
+                className="card"
                 style={{
-                  background: colorPalette.cardBg,
-                  border: 'var(--container-border)',
-                  borderRadius: 'var(--container-border-radius)',
-                  padding: 'var(--spacing-md)',
-                  transition: 'background 0.6s ease'
+                  background: 'var(--ds-bg-surface)',
+                  border: '1px solid var(--ds-border-default)',
+                  borderRadius: 'var(--ds-radius-lg)',
+                  padding: 'var(--ds-space-4)'
                 }}
               >
                 <div style={{
@@ -1214,12 +1181,12 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
             {/* Budget Card */}
             {(job.budget_min || job.budget_max) && (
               <div
+                className="card"
                 style={{
-                  background: colorPalette.cardBg,
-                  border: 'var(--container-border)',
-                  borderRadius: 'var(--container-border-radius)',
-                  padding: 'var(--spacing-md)',
-                  transition: 'background 0.6s ease'
+                  background: 'var(--ds-bg-surface)',
+                  border: '1px solid var(--ds-border-default)',
+                  borderRadius: 'var(--ds-radius-lg)',
+                  padding: 'var(--ds-space-4)'
                 }}
               >
                 <div style={{
@@ -1251,12 +1218,12 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
             {/* Contact Name Card */}
             {job.contact_name && (
               <div
+                className="card"
                 style={{
-                  background: colorPalette.cardBg,
-                  border: 'var(--container-border)',
-                  borderRadius: 'var(--container-border-radius)',
-                  padding: 'var(--spacing-md)',
-                  transition: 'background 0.6s ease'
+                  background: 'var(--ds-bg-surface)',
+                  border: '1px solid var(--ds-border-default)',
+                  borderRadius: 'var(--ds-radius-lg)',
+                  padding: 'var(--ds-space-4)'
                 }}
               >
                 <div style={{
@@ -1282,12 +1249,12 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
             {/* Contact Email Card */}
             {job.contact_email && (
               <div
+                className="card"
                 style={{
-                  background: colorPalette.cardBg,
-                  border: 'var(--container-border)',
-                  borderRadius: 'var(--container-border-radius)',
-                  padding: 'var(--spacing-md)',
-                  transition: 'background 0.6s ease'
+                  background: 'var(--ds-bg-surface)',
+                  border: '1px solid var(--ds-border-default)',
+                  borderRadius: 'var(--ds-radius-lg)',
+                  padding: 'var(--ds-space-4)'
                 }}
               >
                 <div style={{
@@ -1313,12 +1280,12 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
             {/* Contact Phone Card */}
             {job.contact_phone && (
               <div
+                className="card"
                 style={{
-                  background: colorPalette.cardBg,
-                  border: 'var(--container-border)',
-                  borderRadius: 'var(--container-border-radius)',
-                  padding: 'var(--spacing-md)',
-                  transition: 'background 0.6s ease'
+                  background: 'var(--ds-bg-surface)',
+                  border: '1px solid var(--ds-border-default)',
+                  borderRadius: 'var(--ds-radius-lg)',
+                  padding: 'var(--ds-space-4)'
                 }}
               >
                 <div style={{
@@ -1577,13 +1544,13 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5, duration: 0.4 }}
+                    className="card"
                     style={{
-                      marginTop: 'var(--spacing-lg)',
-                      background: colorPalette.cardBg,
-                      border: 'var(--container-border)',
-                      borderRadius: 'var(--container-border-radius)',
-                      padding: 'var(--spacing-lg)',
-                      transition: 'background 0.6s ease'
+                      marginTop: 'var(--ds-space-4)',
+                      background: 'var(--ds-bg-surface)',
+                      border: '1px solid var(--ds-border-default)',
+                      borderRadius: 'var(--ds-radius-lg)',
+                      padding: 'var(--ds-space-5)'
                     }}
                   >
                     <div style={{
@@ -1645,8 +1612,8 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
                           </div>
                           <div style={{
                             fontFamily: 'var(--font-text-body)',
-                            fontSize: 'var(--font-sm)',
-                            color: getBrighterColor(colorPalette.cardBg, 2.5),
+                            fontSize: 'var(--ds-text-sm)',
+                            color: 'var(--ds-text-secondary)',
                             lineHeight: 1.5
                           }}>
                             Initial outreach email sent via Instantly campaign
@@ -1689,8 +1656,8 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
                           </div>
                           <div style={{
                             fontFamily: 'var(--font-text-body)',
-                            fontSize: 'var(--font-sm)',
-                            color: getBrighterColor(colorPalette.cardBg, 2.5),
+                            fontSize: 'var(--ds-text-sm)',
+                            color: 'var(--ds-text-secondary)',
                             lineHeight: 1.5
                           }}>
                             Technician opened the email and viewed job details
@@ -1733,8 +1700,8 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
                           </div>
                           <div style={{
                             fontFamily: 'var(--font-text-body)',
-                            fontSize: 'var(--font-sm)',
-                            color: getBrighterColor(colorPalette.cardBg, 2.5),
+                            fontSize: 'var(--ds-text-sm)',
+                            color: 'var(--ds-text-secondary)',
                             lineHeight: 1.5
                           }}>
                             OpenAI voice agent qualified technician - 4 min conversation
@@ -1792,8 +1759,8 @@ export function JobDetailOverlay({ job, onClose, onStatusChange }: JobDetailOver
                           </div>
                           <div style={{
                             fontFamily: 'var(--font-text-body)',
-                            fontSize: 'var(--font-sm)',
-                            color: getBrighterColor(colorPalette.cardBg, 2.5),
+                            fontSize: 'var(--ds-text-sm)',
+                            color: 'var(--ds-text-secondary)',
                             lineHeight: 1.5
                           }}>
                             Technician confirmed availability and accepted the work order

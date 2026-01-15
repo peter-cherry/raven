@@ -151,7 +151,7 @@ export default function AddressAutocomplete({
           height="20"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="#F59E0B"
+          stroke="var(--ds-warning)"
           strokeWidth="2"
           style={{ animation: 'spin 1s linear infinite' }}
         >
@@ -163,7 +163,7 @@ export default function AddressAutocomplete({
 
     if (validationStatus === 'valid') {
       return (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ds-success)" strokeWidth="2">
           <polyline points="20 6 9 17 4 12"/>
         </svg>
       );
@@ -171,7 +171,7 @@ export default function AddressAutocomplete({
 
     if (validationStatus === 'invalid' && inputValue.length >= 10) {
       return (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EF4444" strokeWidth="2">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ds-error)" strokeWidth="2">
           <circle cx="12" cy="12" r="10"/>
           <line x1="15" y1="9" x2="9" y2="15"/>
           <line x1="9" y1="9" x2="15" y2="15"/>
@@ -195,7 +195,7 @@ export default function AddressAutocomplete({
         <input
           ref={inputRef}
           type="text"
-          className="text-input"
+          className="form-input"
           value={inputValue}
           onChange={(e) => {
             setInputValue(e.target.value);
@@ -210,7 +210,12 @@ export default function AddressAutocomplete({
           style={{
             width: '100%',
             paddingRight: 40,
-            borderColor: error ? 'var(--error)' : validationStatus === 'valid' ? '#10B981' : 'rgba(255, 255, 255, 0.5)'
+            background: 'var(--ds-bg-surface)',
+            border: '1px solid',
+            borderColor: error ? 'var(--ds-error)' : validationStatus === 'valid' ? 'var(--ds-success)' : 'var(--ds-border-default)',
+            borderRadius: 'var(--ds-radius-lg)',
+            color: 'var(--ds-text-primary)',
+            padding: '12px 16px'
           }}
         />
         <div style={{
@@ -227,13 +232,12 @@ export default function AddressAutocomplete({
       {/* Geocoded location info */}
       {validationStatus === 'valid' && geocodedInfo && (
         <div style={{
-          marginTop: 'var(--spacing-xs)',
-          fontSize: 'var(--font-sm)',
-          color: '#10B981',
+          marginTop: 'var(--ds-space-2)',
+          fontSize: 'var(--ds-text-sm)',
+          color: 'var(--ds-success-text)',
           display: 'flex',
           alignItems: 'center',
-          gap: 'var(--spacing-xs)',
-          fontFamily: 'var(--font-text-body)'
+          gap: 'var(--ds-space-2)'
         }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
@@ -246,10 +250,9 @@ export default function AddressAutocomplete({
       {/* Error message */}
       {error && (
         <div style={{
-          marginTop: 'var(--spacing-xs)',
-          fontSize: 'var(--font-sm)',
-          color: 'var(--error)',
-          fontFamily: 'var(--font-text-body)'
+          marginTop: 'var(--ds-space-2)',
+          fontSize: 'var(--ds-text-sm)',
+          color: 'var(--ds-error-text)'
         }}>
           {error}
         </div>
@@ -263,18 +266,17 @@ export default function AddressAutocomplete({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
+            className="dropdown-menu"
             style={{
               position: 'absolute',
               top: 'calc(100% + 4px)',
               left: 0,
               right: 0,
               zIndex: 1000,
-              background: 'rgba(47, 47, 47, 0.98)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              border: '2px solid rgba(255, 255, 255, 0.5)',
-              borderRadius: 'var(--container-border-radius)',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+              background: 'var(--ds-bg-surface)',
+              border: '1px solid var(--ds-border-default)',
+              borderRadius: 'var(--ds-radius-lg)',
+              boxShadow: 'var(--ds-shadow-lg)',
               overflow: 'hidden'
             }}
           >
@@ -283,28 +285,28 @@ export default function AddressAutocomplete({
                 key={suggestion.place_id}
                 type="button"
                 onClick={() => handleSelectSuggestion(suggestion)}
+                className="dropdown-item"
                 style={{
                   width: '100%',
-                  padding: 'var(--spacing-md)',
+                  padding: 'var(--ds-space-3) var(--ds-space-4)',
                   border: 'none',
                   background: 'transparent',
-                  color: 'var(--text-primary)',
+                  color: 'var(--ds-text-primary)',
                   textAlign: 'left',
-                  fontFamily: 'var(--font-text-body)',
-                  fontSize: 'var(--font-md)',
+                  fontSize: 'var(--ds-text-sm)',
                   cursor: 'pointer',
-                  borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-                  transition: 'background 0.2s ease'
+                  borderBottom: '1px solid var(--ds-border-subtle)',
+                  transition: 'background 0.15s ease'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(101, 98, 144, 0.2)';
+                  e.currentTarget.style.background = 'var(--ds-bg-elevated)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'transparent';
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-sm)' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--ds-space-2)' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ds-text-secondary)" strokeWidth="2">
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                     <circle cx="12" cy="10" r="3"/>
                   </svg>

@@ -671,75 +671,64 @@ export function CreateJobForm({ searchText, onSuccess, onClose, policyId, select
   };
 
   return (
-    <div style={{
-      width: '100%'
-    }}>
+    <div className="workorder-form" style={{ width: '100%' }}>
       <style jsx>{`
+        /* Form input styling - Light Theme */
         .text-input, .select-input, .textarea-input {
-          border-color: rgba(255, 255, 255, 0.5) !important;
-          border-radius: var(--container-border-radius) !important;
+          background: var(--ds-bg-surface) !important;
+          border: 1px solid var(--ds-border-default) !important;
+          border-radius: var(--ds-radius-lg) !important;
+          color: var(--ds-text-primary) !important;
         }
+        
+        .text-input:focus, .select-input:focus, .textarea-input:focus {
+          border-color: var(--ds-accent-primary) !important;
+          box-shadow: 0 0 0 3px var(--ds-accent-primary-light) !important;
+        }
+        
+        .text-input::placeholder, .textarea-input::placeholder {
+          color: var(--ds-text-tertiary) !important;
+        }
+        
         .select-input {
-          background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+          background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
         }
-        .text-input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-          filter: invert(1);
-          opacity: 1;
-        }
-        .form-label, .text-input, .select-input, .textarea-input, .primary-button {
-          font-family: var(--font-text-body) !important;
-        }
-        /* Fix datetime-local field alignment and dimensions to match Address field */
-        .text-input[type="datetime-local"] {
-          width: 100% !important;
-          padding: 12px 16px !important;
-          line-height: normal !important;
-          box-sizing: border-box !important;
-          height: auto !important;
-          max-width: 100% !important;
+        
+        .form-label {
+          color: var(--ds-text-primary) !important;
+          font-weight: var(--ds-font-medium) !important;
+          font-size: var(--ds-text-sm) !important;
         }
 
-        /* Mobile responsive - match /app/jobs/create mobile-fix.css */
+        /* Mobile responsive */
         @media (max-width: 768px) {
           .container-card {
             width: 100% !important;
             max-width: 100% !important;
-            min-width: 100% !important;
-            box-sizing: border-box !important;
-            padding: 16px !important;
+            padding: var(--ds-space-4) !important;
           }
 
           .form-grid {
-            display: grid !important;
             grid-template-columns: 1fr !important;
-            gap: 16px !important;
-            width: 100% !important;
+            gap: var(--ds-space-4) !important;
           }
 
-          .text-input,
-          .select-input,
-          .textarea-input {
-            width: 100% !important;
-            max-width: 100% !important;
-            box-sizing: border-box !important;
+          .text-input, .select-input, .textarea-input {
             font-size: 16px !important;
           }
         }
 
-        /* Shimmer loading animation */
-        /* Shimmer animation for loading state - Light Theme */
+        /* Shimmer loading animation - Light Theme */
         @keyframes shimmer {
           0% { background-position: -600px 0; }
           100% { background-position: 600px 0; }
         }
 
-        /* Spin animation for loader */
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }
 
-        /* Pulse animation for text and dots */
         @keyframes pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.5; }
@@ -749,62 +738,20 @@ export function CreateJobForm({ searchText, onSuccess, onClose, policyId, select
           animation: shimmer 2s infinite ease-in-out !important;
           background-image: linear-gradient(
             90deg,
-            var(--ds-bg-elevated, #f1f3f5) 0%,
-            var(--ds-bg-base, #ffffff) 20%,
-            var(--ds-border-subtle, #f0f0f0) 40%,
-            var(--ds-bg-base, #ffffff) 60%,
-            var(--ds-bg-elevated, #f1f3f5) 100%
+            var(--ds-bg-elevated) 0%,
+            var(--ds-bg-surface) 20%,
+            var(--ds-border-subtle) 40%,
+            var(--ds-bg-surface) 60%,
+            var(--ds-bg-elevated) 100%
           ) !important;
-          background-color: var(--ds-bg-elevated, #f1f3f5) !important;
+          background-color: var(--ds-bg-elevated) !important;
           background-size: 600px 100% !important;
-          background-repeat: no-repeat !important;
           color: transparent !important;
           pointer-events: none !important;
         }
 
         .shimmer-loading::placeholder {
           color: transparent !important;
-        }
-
-        /* Form container styling */
-        .container-card.form-grid {
-          background: var(--ds-bg-surface, #ffffff) !important;
-          border: 1px solid var(--ds-border-default, #e0e0e0) !important;
-          border-radius: var(--ds-radius-xl, 12px) !important;
-        }
-
-        /* Form field styling */
-        .form-field .text-input,
-        .form-field .textarea-input,
-        .form-field .select-input {
-          background: var(--ds-bg-base, #ffffff);
-          border: 1px solid var(--ds-border-default, #e0e0e0);
-          color: var(--ds-text-primary, #212529);
-          border-radius: var(--ds-radius-md, 6px);
-        }
-
-        .form-field .text-input:focus,
-        .form-field .textarea-input:focus,
-        .form-field .select-input:focus {
-          outline: none;
-          border-color: var(--ds-accent-primary, #007bff);
-          box-shadow: 0 0 0 3px var(--ds-accent-primary-light, rgba(0, 123, 255, 0.15));
-        }
-
-        .form-field .text-input::placeholder,
-        .form-field .textarea-input::placeholder {
-          color: var(--ds-text-tertiary, #adb5bd);
-        }
-
-        .form-label {
-          color: var(--ds-text-primary, #212529) !important;
-          font-weight: var(--ds-font-medium, 500) !important;
-        }
-
-        @media (max-width: 768px) {
-          .text-input[type="datetime-local"] {
-            max-width: calc(100% - 34px) !important;
-          }
         }
       `}</style>
       {scores && (
@@ -866,7 +813,19 @@ export function CreateJobForm({ searchText, onSuccess, onClose, policyId, select
           </div>
         </div>
       )}
-      <form key={parseKey} className="container-card form-grid" style={{ background: 'var(--ds-bg-surface)', border: '1px solid var(--ds-border-default)', borderRadius: 'var(--ds-radius-xl)', position: 'relative', maxWidth: 1100, maxHeight: '90vh', padding: 'var(--ds-space-6)', display: 'flex', flexDirection: 'column', overflow: 'auto' }} onKeyDown={(e) => {
+      <form key={parseKey} className="card" style={{ 
+        background: 'var(--ds-bg-surface)', 
+        border: '1px solid var(--ds-border-default)', 
+        borderRadius: 'var(--ds-radius-2xl)', 
+        position: 'relative', 
+        maxWidth: 1100, 
+        maxHeight: '90vh', 
+        padding: 0, 
+        display: 'flex', 
+        flexDirection: 'column', 
+        overflow: 'hidden',
+        boxShadow: 'var(--ds-shadow-lg)'
+      }} onKeyDown={(e) => {
         // Prevent Enter key from submitting form unless on submit button
         if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'BUTTON') {
           e.preventDefault();
@@ -1022,6 +981,7 @@ export function CreateJobForm({ searchText, onSuccess, onClose, policyId, select
         if (jobId) {
           console.log('[CreateJobForm] Edit mode - using existing jobId:', jobId);
           setSubmitState('success');
+          setSubmitting(false);
 
           // Delete the draft on successful submission
           if (currentDraftId) {
@@ -1044,6 +1004,8 @@ export function CreateJobForm({ searchText, onSuccess, onClose, policyId, select
         if (job) {
           // Show success state briefly
           setSubmitState('success');
+          setSubmitting(false);
+          
           // Delete the draft on successful submission
           if (currentDraftId) {
             drafts.deleteDraft(currentDraftId);
@@ -1058,37 +1020,23 @@ export function CreateJobForm({ searchText, onSuccess, onClose, policyId, select
           }, 800); // Brief delay to show success state
         } else {
           setSubmitState('idle');
+          setSubmitting(false);
         }
       }} aria-label="Work order form">
         {/* Header buttons - Emergency toggle and Close */}
-        <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 10, display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ position: 'absolute', top: 'var(--ds-space-4)', right: 'var(--ds-space-4)', zIndex: 10, display: 'flex', alignItems: 'center', gap: 'var(--ds-space-3)' }}>
           {/* Emergency Toggle */}
           <button
             type="button"
             onClick={() => setIsEmergency(!isEmergency)}
+            className={isEmergency ? 'btn btn-danger btn-sm' : 'btn btn-secondary btn-sm'}
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 8,
-              padding: '8px 16px',
-              borderRadius: 'var(--ds-radius-md)',
-              background: isEmergency ? 'var(--ds-error-bg)' : 'transparent',
-              border: `2px solid ${isEmergency ? 'var(--ds-error)' : 'var(--ds-border-default)'}`,
-              color: isEmergency ? 'var(--ds-error)' : 'var(--ds-text-secondary)',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              fontSize: 'var(--ds-text-sm)',
-              fontWeight: 'var(--ds-font-semibold)'
-            }}
-            onMouseEnter={(e) => {
-              if (!isEmergency) {
-                e.currentTarget.style.borderColor = 'var(--ds-border-strong)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isEmergency) {
-                e.currentTarget.style.borderColor = 'var(--ds-border-default)';
-              }
+              gap: 'var(--ds-space-2)',
+              background: isEmergency ? 'var(--ds-error-bg)' : 'var(--ds-bg-surface)',
+              border: `1px solid ${isEmergency ? 'var(--ds-error)' : 'var(--ds-border-default)'}`,
+              color: isEmergency ? 'var(--ds-error)' : 'var(--ds-text-secondary)'
             }}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1104,15 +1052,15 @@ export function CreateJobForm({ searchText, onSuccess, onClose, policyId, select
         </div>
 
         {/* Fixed Header */}
-        <div style={{ paddingBottom: 5, position: 'relative', zIndex: 1 }}>
-          <h1 style={{ fontSize: 'var(--ds-text-2xl)', fontWeight: 'var(--ds-font-bold)', color: 'var(--ds-text-primary)', margin: 0, marginBottom: 'var(--ds-space-1)' }}>Create work order</h1>
-          <p style={{ fontSize: 'var(--ds-text-sm)', color: 'var(--ds-text-secondary)', margin: 0 }}>Provide job details for technician assignment</p>
+        <div className="workorder-form__header" style={{ padding: 'var(--ds-space-6)', borderBottom: '1px solid var(--ds-border-subtle)', background: 'var(--ds-bg-muted)' }}>
+          <h1 className="workorder-form__title" style={{ fontSize: 'var(--ds-text-xl)', fontWeight: 'var(--ds-font-bold)', color: 'var(--ds-text-primary)', margin: 0, marginBottom: 'var(--ds-space-1)' }}>Create work order</h1>
+          <p className="workorder-form__subtitle" style={{ fontSize: 'var(--ds-text-sm)', color: 'var(--ds-text-secondary)', margin: 0 }}>Provide job details for technician assignment</p>
 
           {/* Draft indicator */}
           {currentDraftId && (
             <div style={{
               fontSize: 'var(--ds-text-xs)',
-              color: 'var(--ds-text-tertiary)',
+              color: 'var(--ds-success)',
               marginTop: 'var(--ds-space-2)',
               display: 'flex',
               alignItems: 'center',
@@ -1127,18 +1075,14 @@ export function CreateJobForm({ searchText, onSuccess, onClose, policyId, select
 
           {/* Paste Detection Banner */}
           {showPasteBanner && !parsed && (
-            <div style={{
+            <div className="info-box" style={{
               marginTop: 'var(--ds-space-4)',
-              padding: 'var(--ds-space-4)',
-              background: 'var(--ds-info-bg)',
-              border: '1px solid var(--ds-info-border)',
-              borderRadius: 'var(--ds-radius-lg)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               gap: 'var(--ds-space-4)'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--ds-space-2)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--ds-space-3)' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ds-info)" strokeWidth="2">
                   <circle cx="12" cy="12" r="10"/>
                   <line x1="12" y1="16" x2="12" y2="12"/>
@@ -1146,25 +1090,11 @@ export function CreateJobForm({ searchText, onSuccess, onClose, policyId, select
                 </svg>
                 <div>
                   <div style={{
-                    fontSize: 'var(--ds-text-md)',
+                    fontSize: 'var(--ds-text-sm)',
                     fontWeight: 'var(--ds-font-semibold)',
-                    color: 'var(--ds-info)',
-                    marginBottom: '2px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px'
+                    color: 'var(--ds-info-text)',
+                    marginBottom: '2px'
                   }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ds-info)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="5"/>
-                      <line x1="12" y1="1" x2="12" y2="3"/>
-                      <line x1="12" y1="21" x2="12" y2="23"/>
-                      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-                      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-                      <line x1="1" y1="12" x2="3" y2="12"/>
-                      <line x1="21" y1="12" x2="23" y2="12"/>
-                      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-                    </svg>
                     Pro Tip
                   </div>
                   <div style={{ fontSize: 'var(--ds-text-sm)', color: 'var(--ds-text-secondary)' }}>
@@ -1175,13 +1105,8 @@ export function CreateJobForm({ searchText, onSuccess, onClose, policyId, select
               <button
                 type="button"
                 onClick={() => setShowPasteBanner(false)}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'var(--ds-text-tertiary)',
-                  cursor: 'pointer',
-                  padding: 'var(--ds-space-2)'
-                }}
+                className="btn btn-ghost"
+                style={{ padding: 'var(--ds-space-2)' }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <line x1="18" y1="6" x2="6" y2="18"/>
@@ -1199,7 +1124,7 @@ export function CreateJobForm({ searchText, onSuccess, onClose, policyId, select
             width: '100%',
             padding: 'var(--ds-space-4) 0',
             marginTop: 'var(--ds-space-4)',
-            marginBottom: 'var(--ds-space-3)'
+            borderTop: '1px solid var(--ds-border-subtle)'
           }}>
             <FormProgressIndicator
               currentStep={currentStep}
@@ -1209,11 +1134,8 @@ export function CreateJobForm({ searchText, onSuccess, onClose, policyId, select
                 { label: 'Contact Info' }
               ]}
               onStepClick={(stepIndex) => {
-                console.log('[CreateJobForm] Step clicked:', stepIndex);
                 const refs = [jobDetailsRef, scheduleRef, contactRef];
                 const targetRef = refs[stepIndex];
-                console.log('[CreateJobForm] targetRef exists:', !!targetRef?.current);
-                console.log('[CreateJobForm] outerScrollRef exists:', !!outerScrollRef.current);
 
                 if (targetRef?.current && outerScrollRef.current) {
                   const container = outerScrollRef.current;
@@ -1222,21 +1144,10 @@ export function CreateJobForm({ searchText, onSuccess, onClose, policyId, select
                   const targetRect = targetElement.getBoundingClientRect();
                   const scrollOffset = targetRect.top - containerRect.top + container.scrollTop - 20;
 
-                  console.log('[CreateJobForm] Container scrollTop:', container.scrollTop);
-                  console.log('[CreateJobForm] Target offset from top:', targetRect.top - containerRect.top);
-                  console.log('[CreateJobForm] Final scroll offset:', scrollOffset);
-
                   container.scrollTo({
                     top: scrollOffset,
                     behavior: 'smooth'
                   });
-
-                  // Verify scroll happened
-                  setTimeout(() => {
-                    console.log('[CreateJobForm] After scroll - scrollTop:', container.scrollTop);
-                  }, 100);
-                } else {
-                  console.log('[CreateJobForm] Cannot scroll - missing refs');
                 }
               }}
             />
@@ -1244,7 +1155,7 @@ export function CreateJobForm({ searchText, onSuccess, onClose, policyId, select
         </div>
 
         {/* Scrollable Content Container */}
-        <div ref={outerScrollRef} style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', position: 'relative', zIndex: 1 }}>
+        <div ref={outerScrollRef} className="workorder-form__body" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', position: 'relative', zIndex: 1, padding: 'var(--ds-space-6)' }}>
           <div
             ref={scrollRef}
             onScroll={(e) => {
@@ -1252,12 +1163,10 @@ export function CreateJobForm({ searchText, onSuccess, onClose, policyId, select
               setScrollTop(target.scrollTop);
               setIsScrolling(true);
 
-              // Clear existing timeout
               if (scrollTimeoutRef.current) {
                 clearTimeout(scrollTimeoutRef.current);
               }
 
-              // Set timeout to detect when scrolling stops
               scrollTimeoutRef.current = setTimeout(() => {
                 setIsScrolling(false);
               }, 150);
@@ -1266,25 +1175,11 @@ export function CreateJobForm({ searchText, onSuccess, onClose, policyId, select
               width: '100%',
               height: '100%',
               overflowY: 'auto',
-              overflowX: 'hidden',
-              paddingRight: '20px'
+              overflowX: 'hidden'
             }}
           >
-          {/* Top Glow - subtle indicator when scrolled */}
-          <div style={{
-            position: 'sticky',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 20,
-            background: (scrollTop > 10 && isScrolling) ? 'linear-gradient(to bottom, var(--ds-border-subtle), transparent)' : 'transparent',
-            pointerEvents: 'none',
-            zIndex: 5,
-            transition: 'background 0.4s ease',
-            marginBottom: -20
-          }} />
 
-          <div className="form-grid">
+          <div className="form-section">
           <div ref={jobDetailsRef} className="form-field">
             <label className="form-label" htmlFor="job_title">Work order title</label>
             <input
@@ -1555,56 +1450,36 @@ export function CreateJobForm({ searchText, onSuccess, onClose, policyId, select
           {errors.form && <div style={{ color: 'var(--error)' }}>{errors.form}</div>}
         </div>
 
-        {/* Bottom Glow */}
-        <div style={{
-          position: 'sticky',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 20,
-          background: isScrolling ? 'linear-gradient(to top, rgba(108, 114, 201, 0.3), transparent)' : 'transparent',
-          pointerEvents: 'none',
-          zIndex: 5,
-          marginTop: -20,
-          transition: 'background 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
-        }} />
           </div>
         </div>
 
         {/* Policy Reminder - Above submit button */}
         {(effectivePolicyId || policyDetails) && (
           <div style={{
-            padding: '12px 24px',
-            background: 'rgba(101, 98, 144, 0.15)',
-            borderTop: '1px solid rgba(101, 98, 144, 0.3)',
+            padding: 'var(--ds-space-3) var(--ds-space-6)',
+            background: 'var(--ds-success-bg)',
+            borderTop: '1px solid var(--ds-success-border)',
             display: 'flex',
             alignItems: 'center',
-            gap: 12,
+            gap: 'var(--ds-space-3)',
           }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-primary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ds-success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
             </svg>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--ds-space-2)', marginBottom: 'var(--ds-space-1)' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ds-success)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="20 6 9 17 4 12"/>
                 </svg>
-                <span style={{ fontSize: 12, fontWeight: 600, color: '#10B981' }}>
+                <span style={{ fontSize: 'var(--ds-text-xs)', fontWeight: 'var(--ds-font-semibold)', color: 'var(--ds-success-text)' }}>
                   Compliance Policy Confirmed
                 </span>
               </div>
-              <div style={{ fontSize: 10, color: 'var(--text-secondary)', display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+              <div style={{ fontSize: 'var(--ds-text-xs)', color: 'var(--ds-text-secondary)', display: 'flex', flexWrap: 'wrap', gap: 'var(--ds-space-2)' }}>
                 {policyDetails ? (
                   policyDetails.requirements.length > 0 ? (
                     policyDetails.requirements.map((req, i) => (
-                      <span key={i} style={{
-                        background: 'rgba(16, 185, 129, 0.15)',
-                        border: '1px solid rgba(16, 185, 129, 0.3)',
-                        padding: '2px 8px',
-                        borderRadius: 4,
-                        whiteSpace: 'nowrap',
-                        color: 'var(--text-primary)'
-                      }}>
+                      <span key={i} className="badge badge-success" style={{ fontSize: 'var(--ds-text-xs)' }}>
                         {req}
                       </span>
                     ))
@@ -1616,22 +1491,26 @@ export function CreateJobForm({ searchText, onSuccess, onClose, policyId, select
         )}
 
         {/* Sticky Submit Button - Outside scrollable container */}
-        <div style={{
+        <div className="workorder-form__footer" style={{
           position: 'relative',
           zIndex: 1,
           flexShrink: 0,
-          padding: '16px 24px',
-          background: 'transparent',
-          borderTop: (effectivePolicyId || policyDetails) ? 'none' : '1px solid rgba(255, 255, 255, 0.1)'
+          padding: 'var(--ds-space-5) var(--ds-space-6)',
+          background: 'var(--ds-bg-muted)',
+          borderTop: '1px solid var(--ds-border-subtle)'
         }}>
-          <button className="primary-button" disabled={submitting || submitState === 'submitting'} type="submit" style={{
-            background: submitState === 'success' ? '#10B981' : '#656290',
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 'var(--spacing-sm)'
-          }}>
+          <button 
+            className={submitState === 'success' ? 'btn btn-success btn-lg' : 'btn btn-primary btn-lg'} 
+            disabled={submitting || submitState === 'submitting'} 
+            type="submit" 
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 'var(--ds-space-2)'
+            }}
+          >
             {submitState === 'submitting' || submitting ? (
               <>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: 'spin 1s linear infinite' }}>
@@ -1656,47 +1535,42 @@ export function CreateJobForm({ searchText, onSuccess, onClose, policyId, select
         </div>
       </form>
 
-      {/* Loading Overlay - Prominent Animation */}
+      {/* Loading Overlay - Clean Light Theme */}
       {(submitState === 'submitting' || submitting) && (
         <div
+          className="modal-backdrop"
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(0, 0, 0, 0.85)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
+            background: 'rgba(255, 255, 255, 0.95)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 10000,
             flexDirection: 'column',
-            gap: 24
+            gap: 'var(--ds-space-6)'
           }}
         >
           {/* Large Spinner */}
           <svg
-            width="80"
-            height="80"
+            width="64"
+            height="64"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#656290"
+            stroke="var(--ds-accent-primary)"
             strokeWidth="2"
-            style={{
-              animation: 'spin 1s linear infinite',
-              filter: 'drop-shadow(0 0 12px rgba(101, 98, 144, 0.5))'
-            }}
+            style={{ animation: 'spin 1s linear infinite' }}
           >
-            <circle cx="12" cy="12" r="10" opacity="0.25" />
+            <circle cx="12" cy="12" r="10" opacity="0.2" />
             <path d="M12 2 A10 10 0 0 1 22 12" strokeLinecap="round" />
           </svg>
 
           {/* Loading Text */}
           <div style={{
-            fontSize: 24,
-            fontWeight: 600,
-            color: '#F9F3E5',
-            textAlign: 'center',
-            animation: 'pulse 2s ease-in-out infinite'
+            fontSize: 'var(--ds-text-xl)',
+            fontWeight: 'var(--ds-font-semibold)',
+            color: 'var(--ds-text-primary)',
+            textAlign: 'center'
           }}>
             Creating Work Order...
           </div>
@@ -1704,20 +1578,19 @@ export function CreateJobForm({ searchText, onSuccess, onClose, policyId, select
           {/* Pulsing dots */}
           <div style={{
             display: 'flex',
-            gap: 8,
+            gap: 'var(--ds-space-2)',
             alignItems: 'center'
           }}>
             {[0, 1, 2].map((i) => (
               <div
                 key={i}
                 style={{
-                  width: 12,
-                  height: 12,
+                  width: 10,
+                  height: 10,
                   borderRadius: '50%',
-                  background: '#656290',
+                  background: 'var(--ds-accent-primary)',
                   animation: `pulse 1.5s ease-in-out infinite`,
-                  animationDelay: `${i * 0.2}s`,
-                  boxShadow: '0 0 12px rgba(101, 98, 144, 0.5)'
+                  animationDelay: `${i * 0.2}s`
                 }}
               />
             ))}

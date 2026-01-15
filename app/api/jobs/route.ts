@@ -9,36 +9,44 @@ import {
 import { createRequestLogger, getOrCreateRequestId } from '@/lib/server/logger';
 import { getAuthenticatedUser, getUserOrgMembership, requireOrgMembership, ForbiddenError, UnauthorizedError } from '@/lib/server/auth';
 
-// Request validation schema
+// Check if we should use mock mode
+function isMockMode(): boolean {
+  const mockModeFlag = process.env.NEXT_PUBLIC_MOCK_MODE === 'true';
+  const missingCredentials = !process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY;
+  return mockModeFlag || missingCredentials;
+}
+
+// Request validation schema - allow any string for org_id in mock mode
+// Note: .nullable() allows null values, .optional() allows undefined
 const CreateJobSchema = z.object({
-  org_id: z.string().uuid(),
+  org_id: z.string().min(1),
   job_title: z.string().min(1, 'Job title is required'),
-  description: z.string().optional(),
+  description: z.string().nullable().optional(),
   trade_needed: z.string().min(1, 'Trade is required'),
-  required_certifications: z.array(z.string()).optional(),
+  required_certifications: z.array(z.string()).nullable().optional(),
   address_text: z.string().min(1, 'Address is required'),
-  lat: z.number().optional(),
-  lng: z.number().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
+  lat: z.number().nullable().optional(),
+  lng: z.number().nullable().optional(),
+  city: z.string().nullable().optional(),
+  state: z.string().nullable().optional(),
   urgency: z.enum(['emergency', 'same_day', 'next_day', 'within_week', 'flexible']),
-  scheduled_at: z.string().optional(),
-  duration: z.string().optional(),
-  budget_min: z.number().optional(),
-  budget_max: z.number().optional(),
-  pay_rate: z.string().optional(),
-  contact_name: z.string().min(1, 'Contact name is required'),
-  contact_phone: z.string().min(1, 'Contact phone is required'),
-  contact_email: z.string().email('Valid email is required'),
-  policy_id: z.string().uuid().optional(),
+  scheduled_at: z.string().nullable().optional(),
+  duration: z.string().nullable().optional(),
+  budget_min: z.number().nullable().optional(),
+  budget_max: z.number().nullable().optional(),
+  pay_rate: z.string().nullable().optional(),
+  contact_name: z.string().nullable().optional().transform(val => val || ''),
+  contact_phone: z.string().nullable().optional().transform(val => val || ''),
+  contact_email: z.string().nullable().optional().transform(val => val || ''),
+  policy_id: z.string().uuid().nullable().optional(),
   sla_config: z.object({
     dispatch: z.number(),
     assignment: z.number(),
     arrival: z.number(),
     completion: z.number(),
-  }).optional(),
-  dispatch_immediately: z.boolean().optional(),
-  idempotency_key: z.string().optional(),
+  }).nullable().optional(),
+  dispatch_immediately: z.boolean().nullable().optional(),
+  idempotency_key: z.string().nullable().optional(),
 });
 
 /**
@@ -84,7 +92,43 @@ export async function POST(request: NextRequest) {
       throw err;
     }
 
-    // 4. Create job using lifecycle service
+    // 4. Mock mode - return mock job without database
+    if (isMockMode()) {
+      logger.info('Mock mode: returning mock job');
+      const mockJob = {
+        id: `mock-job-${Date.now()}`,
+        org_id: input.org_id,
+        job_title: input.job_title,
+        description: input.description,
+        trade_needed: input.trade_needed,
+        address_text: input.address_text,
+        city: input.city,
+        state: input.state,
+        lat: input.lat,
+        lng: input.lng,
+        urgency: input.urgency,
+        scheduled_at: input.scheduled_at,
+        contact_name: input.contact_name,
+        contact_phone: input.contact_phone,
+        contact_email: input.contact_email,
+        job_status: 'pending',
+        created_at: new Date().toISOString(),
+        created_by: user.id,
+      };
+      
+      return NextResponse.json(
+        {
+          job: mockJob,
+          dispatch: { warm_sent: 0, cold_sent: 0 },
+          sla_timers: null,
+          duplicate: false,
+          mock: true,
+        },
+        { status: 201 }
+      );
+    }
+
+    // 5. Create job using lifecycle service
     const jobService = createJobLifecycleService(supabase, user.id, input.org_id);
     const result = await jobService.createWithDispatch(input);
 
@@ -168,7 +212,26 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50', 10);
     const offset = parseInt(searchParams.get('offset') || '0', 10);
 
-    // 4. Query jobs
+    // 4. Mock mode - return mock jobs
+    if (isMockMode()) {
+      logger.info('Mock mode: returning mock jobs');
+      const { MOCK_JOBS } = await import('@/lib/mock-supabase');
+      let mockJobs = [...MOCK_JOBS];
+      
+      if (status) {
+        mockJobs = mockJobs.filter(job => job.job_status === status);
+      }
+      
+      return NextResponse.json({
+        jobs: mockJobs.slice(offset, offset + limit),
+        total: mockJobs.length,
+        limit,
+        offset,
+        mock: true,
+      });
+    }
+
+    // 5. Query jobs
     let query = supabase
       .from('jobs')
       .select('*, technicians(id, full_name, email, phone)', { count: 'exact' })

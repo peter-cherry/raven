@@ -3,8 +3,28 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
+// Check if we should use mock mode (no Supabase configured)
+function shouldUseMockMode(): boolean {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const mockMode = process.env.NEXT_PUBLIC_MOCK_MODE === 'true';
+  return mockMode || !url || !serviceKey;
+}
+
 export async function POST(request: Request) {
   try {
+    const { address, trade, org_id, exclude_id } = await request.json();
+
+    // Mock mode - return no duplicates for testing without database
+    if (shouldUseMockMode()) {
+      console.log('[Duplicate Check] Mock mode: returning no duplicates');
+      return NextResponse.json({
+        hasDuplicates: false,
+        duplicates: [],
+        mock: true
+      });
+    }
+
     // Development mode bypass - use service role key for reliable access
     const isDevelopment = process.env.NODE_ENV === 'development';
     let supabase: any;
@@ -18,8 +38,6 @@ export async function POST(request: Request) {
       const cookieStore = cookies();
       supabase = createRouteHandlerClient({ cookies: () => cookieStore });
     }
-
-    const { address, trade, org_id, exclude_id } = await request.json();
 
     if (!address || !trade) {
       return NextResponse.json(
